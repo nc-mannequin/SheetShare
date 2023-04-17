@@ -1,17 +1,26 @@
-<script setup>
+<script>
+export default {
+    name: 'Home',
+    data() {
+        return {
 
+        }
+    },
+    methods: {
+
+    }
+}
 </script>
 
 <template>
 <body>
   <nav class="navbar navbar-light navbar-expand-md fixed-top navbar-shrink py-3" id="mainNav">
-        <div class="container"><a class="navbar-brand d-flex align-items-center" href="/"><span>SheetShare</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+        <div class="container"><a class="navbar-brand d-flex align-items-center"><RouterLink to="/"><span>SheetShare</span></RouterLink></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><RouterLink to="/"><a class="nav-link active">Home</a></RouterLink></li>
-                    <li class="nav-item"><RouterLink to="/"><a class="nav-link">Features</a></RouterLink></li>
-                    <li class="nav-item"><RouterLink to="/"><a class="nav-link">Contacts</a></RouterLink></li>
-                </ul><a class="btn btn-primary shadow" role="button" href="signup.html">Sign up</a>
+                    <li class="nav-item"><RouterLink to="/contact"><a class="nav-link">Contacts</a></RouterLink></li>
+                </ul><RouterLink to="/login"><a class="btn btn-primary shadow" role="button">Login</a></RouterLink>
             </div>
         </div>
     </nav>
@@ -49,9 +58,7 @@
                                 </svg></div>
                             <div>
                                 <h4 class="fw-bold">Sharing</h4>
-                                <p class="text-muted" style="font-size: 16px;text-align: left;">Unleash your creativity and share your knowledge through customized worksheets, exams, or study notes.</p><button class="btn btn-sm px-0" type="button">Learn More&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-right">
-                                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"></path>
-                                    </svg><br></button>
+                                <p class="text-muted" style="font-size: 16px;text-align: left;">Unleash your creativity and share your knowledge through customized worksheets, exams, or study notes.</p>
                             </div>
                         </div>
                     </div>
@@ -66,9 +73,7 @@
                                 </svg></div>
                             <div>
                                 <h4 class="fw-bold">Connecting</h4>
-                                <p class="text-muted" style="font-size: 16px;">Connect and learn from a variety of learning materials, and engage in meaningful discussions with other members of the community</p><button class="btn btn-sm px-0" type="button">Learn More&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-right">
-                                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"></path>
-                                    </svg><br></button>
+                                <p class="text-muted" style="font-size: 16px;">Connect and learn from a variety of learning materials, and engage in meaningful discussions with other members of the community.</p>
                             </div>
                         </div>
                     </div>
@@ -88,9 +93,7 @@
                                 </svg></div>
                             <div>
                                 <h4 class="fw-bold">Grouping</h4>
-                                <p class="text-muted" style="font-size: 16px;">Create study groups and collaborate with other users. Easily share learning materials within the group and work together to achieve your goals!</p><button class="btn btn-sm px-0" type="button">Learn More&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-right">
-                                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"></path>
-                                    </svg><br></button>
+                                <p class="text-muted" style="font-size: 16px;">Create study groups and collaborate with other users. Easily share learning materials within the group and work together to achieve your goals!</p>
                             </div>
                         </div>
                     </div>
@@ -103,7 +106,7 @@
                     <div style="max-width: 350px;">
                         <h1 class="display-6 fw-bold mb-4"><span class="underline">Everyone</span> deserves the&nbsp;chance to learn.</h1>
                         <p class="my-4">Join us in creating a community where knowledge is freely shared and easily accessible, because together, we can make a difference in empowering education for all.</p>
-                        <a class="btn btn-primary shadow" role="button" href="signup.html" style="display: grid;">Sign up</a>
+                        <RouterLink to="/login"><a class="btn btn-primary shadow" role="button" style="display: grid;">Login</a></RouterLink>
                     </div>
                 </div>
                 <div class="col-md-6">
