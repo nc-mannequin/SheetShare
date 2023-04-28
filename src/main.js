@@ -6,6 +6,7 @@ import './assets/bootstrap/css/bootstrap.min.css'
 import './assets/main.css'
 
 import { initializeApp } from "firebase/app";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDmpQpD4A2xZP_UCzZNrG7jjiKRkNe2Z_4",
@@ -18,7 +19,8 @@ const firebaseConfig = {
   };
 
 // Initialize Firebase
-initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
+getStorage(firebaseApp)
 
 const app = createApp(App)
 
