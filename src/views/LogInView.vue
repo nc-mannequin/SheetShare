@@ -19,6 +19,7 @@ export default {
                     console.log("Token: "+ token)
                     const user = result.user
                     console.log("User: "+ user)
+                    console.log(credential,result)
                     this.$router.replace("/main")
                 })
                 .catch((error) => {
