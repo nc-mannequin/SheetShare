@@ -12,7 +12,9 @@ export default{
         isLoggedIn: false,
         userId:"",
         user:{},
-        file:{}
+        file:{},
+        group_text:"",
+        user_group:[]
     }
   },
   mounted () {
@@ -21,14 +23,13 @@ export default{
     onSnapshot(colRef, async snapShot => {
       const current_user = this.auth.currentUser
       const exist_user = snapShot.docs.map(doc => [doc.id,doc.data()] ).filter(f => f[1].user_id == current_user.uid)
-      console.log(exist_user)
-      
       const docRef = doc(collection(db,"user"))
       if(exist_user.length == 0){
         const dataObj = {
           created_at: Timestamp.now(),
           display_name:current_user.displayName,
           fav_materials_id:[],
+          group_id:[],
           identifier_email:current_user.email,
           own_materials_id:[],
           photo_url:"https://picsum.photos/200/300",
@@ -36,17 +37,27 @@ export default{
           user_id:current_user.uid
         }
         const insertRef = await setDoc(docRef, dataObj)
-        console.log(insertRef)
         this.user = insertRef
       }
       else
       {
-        console.log(exist_user)
-        console.log(exist_user[0])
         this.userId = exist_user[0][0]
         this.user = exist_user[0][1]
       }
+      const groupColRef = collection(db,"group")
+      onSnapshot(groupColRef, (snapShot) => 
+      {
+        this.user_group = snapShot.docs.map(doc => [doc.id,doc.data()]).filter(f => this.user.group_id.includes(f[0]))
+        for (let index = 0; index < this.user_group.length; index++) {
+          console.log(this.user_group[index][0])
+          console.log(this.user_group[index][1])
+        }
+      }
+      )
     },(err)=>{console.log(err)})
+
+    
+
     onAuthStateChanged(this.auth, (user) => {
             if(user) {
                 this.isLoggedIn= true
@@ -54,6 +65,7 @@ export default{
                 this.isLoggedIn= false
             }
         })
+    
     
     
   },
@@ -111,10 +123,68 @@ export default{
       }
       document.getElementById("file_upload").value = ""
       
-    }
+    },
+    async onDeleteFile(url){
+      const db = getFirestore()
+      const docRef = doc(db,"user/"+this.userId)
+      var arr_id = []
+      arr_id = arr_id.concat(this.user.own_materials_id)
+      const dataObj = {
+        own_materials_id: arr_id.filter(f => f!=url)
+      }
+      const updateRef = await updateDoc(docRef, dataObj)
+    },
+    async onNewGroupClick(){
+      console.log(this.group_text)
+      const db = getFirestore()
+      const groupDocRef = doc(collection(db,"group"))
+      const dataObj = {
+          created_at: Timestamp.now(),
+          created_by: this.user.display_name,
+          description: "temp_description",
+          group_name: this.group_text,
+          materials:[],
+          members:[this.user.user_id]
+      }
+      const insertRef = await setDoc(groupDocRef, dataObj)
+      const userDocRef = doc(db,"user/"+this.userId)
+      var arr_id = []
+      arr_id = arr_id.concat(this.user.group_id)
+      const userDataObj = {
+        group_id: arr_id.concat(groupDocRef.id)
+      }
+      const updateRef = await updateDoc(userDocRef, userDataObj)
+
+    },
+    async onLeaveGroupClick(group_id){
+      const db = getFirestore()
+
+      const groupDocRef = doc(db,"group/"+group_id)
+      var arr_id = []
+      arr_id = arr_id.concat(this.user_group.filter(f => f[0] == group_id)[0][1].members)
+      console.log(arr_id)
+      console.log(arr_id[0])
+      console.log(arr_id[0][1])
+      const groupDataObj = {
+        members: arr_id.filter(f=>f!=this.user.user_id)
+      }
+      await updateDoc(groupDocRef, groupDataObj)
+
+      const docRef = doc(db,"user/"+this.userId)
+      var arr_id = []
+      arr_id = arr_id.concat(this.user.group_id)
+      const dataObj = {
+        group_id: arr_id.filter(f => f!=group_id)
+      }
+      await updateDoc(docRef, dataObj)
 
       
-  }
+    }
+    
+
+      
+  },
+  
 }
 </script>
 
@@ -127,19 +197,44 @@ export default{
   <p>own material</p>
   <ul>
       <li v-for="filename in user.own_materials_id">
-        {{ filename.slice(42) }} <button class="btn btn-default"  @click="onDownloadFile(filename)">DownLoad</button>
+        {{ filename.slice(42) }} 
+        <button class="btn btn-default"  @click="onDownloadFile(filename)">DownLoad</button>
+        <button class="btn btn-default"  @click="onDeleteFile(filename)">Delete</button>
       </li>      
   </ul>
   <br>
   <p>fav material</p>
-  <li>
-    <ul></ul>
-  </li>
+  <ul>
+      <li v-for="filename in user.fav_materials_id">
+        {{ filename.slice(42) }} 
+        <button class="btn btn-default"  @click="onDownloadFile(filename)">DownLoad</button>
+        <button class="btn btn-default"  @click="onDeleteFile(filename)">Delete</button>
+      </li>      
+  </ul>
 
 </section>
+
 <button class="btn btn-default"  @click="logout">Logout</button>
 
 <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
+
+<section>
+  <h1>My Group</h1>
+  <input type="text" v-model="group_text">
+  <button class="btn btn-default" @click="onNewGroupClick()">New Group</button>
+  <div class="container" v-for="group in user_group">
+    <h1>{{ group[1].group_name }}</h1>
+    <h3>{{ group[1].description }}</h3>
+    <h5>Members</h5>
+    <ul>
+      <li v-for="member in group[1].members">
+        {{ member }}
+      </li>
+    </ul>
+    <button class="btn btn-default" @click="onLeaveGroupClick(group[0])">Leave Group</button>
+  </div>
+  
+</section>
 </template>
 
 <style scoped>
