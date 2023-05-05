@@ -1,7 +1,7 @@
 <script>
 import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
-import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore'
+import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc } from 'firebase/firestore'
 
 
 export default{
@@ -14,7 +14,8 @@ export default{
         user:{},
         file:{},
         group_text:"",
-        user_group:[]
+        user_group:[],
+        own_materials:[]
     }
   },
   mounted () {
@@ -52,8 +53,11 @@ export default{
           console.log(this.user_group[index][0])
           console.log(this.user_group[index][1])
         }
-      }
-      )
+      })
+      const materialColRef = collection(db,"material")
+      onSnapshot(materialColRef,(snapShot) => {
+        this.own_materials = snapShot.docs.map(doc => [doc.id,doc.data()]).filter(f => this.user.own_materials_id.includes(f[0]))
+      })
     },(err)=>{console.log(err)})
 
     
@@ -108,15 +112,31 @@ export default{
         const storageRef = ref(storage, url);
         uploadBytes(storageRef, afile)
         .then(async (snapshot)=>{
-          console.log(snapshot.metadata.fullPath)
+          console.log(snapshot.metadata)
           const db = getFirestore()
-          const docRef = doc(db,"user/"+this.userId)
+
+          const materialDocRef = doc(collection(db,"material"))
+          const materialDataObj = {
+            comments:[],
+            created_at: Timestamp.now(),
+            description:"",
+            file_url:snapshot.metadata.fullPath,
+            level:"test",
+            likes:[],
+            subject:"test",
+            tags:[],
+            title:snapshot.metadata.fullPath.slice(42),
+            user_id:this.user.user_id
+          }
+          await setDoc(materialDocRef, materialDataObj)
+
+          const userDocRef = doc(db,"user/"+this.userId)
           var arr_id = []
           arr_id = arr_id.concat(this.user.own_materials_id)
           const dataObj = {
-            own_materials_id: arr_id.concat(snapshot.metadata.fullPath)
+            own_materials_id: arr_id.concat(materialDocRef.id)
           }
-          const updateRef = await updateDoc(docRef, dataObj)
+          await updateDoc(userDocRef, dataObj)
         })
       }
         
@@ -179,6 +199,13 @@ export default{
       await updateDoc(docRef, dataObj)
 
       
+    },
+    getFilenameFromId(fileId){
+      const target_file = this.own_materials.find( file => file[0] == fileId )
+      return target_file != undefined ? target_file[1].title : "Error, File Not Found"
+    },
+    getFilePathFromFileId(fileId){
+      return this.own_materials.find( file => file[0] == fileId )[1].file_url
     }
     
 
@@ -196,10 +223,10 @@ export default{
   <h3>{{ user.identifier_email }}</h3>
   <p>own material</p>
   <ul>
-      <li v-for="filename in user.own_materials_id">
-        {{ filename.slice(42) }} 
-        <button class="btn btn-default"  @click="onDownloadFile(filename)">DownLoad</button>
-        <button class="btn btn-default"  @click="onDeleteFile(filename)">Delete</button>
+      <li v-for="fileId in user.own_materials_id">
+        {{ getFilenameFromId(fileId) }}
+        <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
+        <button class="btn btn-default"  @click="onDeleteFile(getFilePathFromFileId(fileId))">Delete</button>
       </li>      
   </ul>
   <br>
@@ -214,9 +241,7 @@ export default{
 
 </section>
 
-<button class="btn btn-default"  @click="logout">Logout</button>
 
-<input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
 
 <section>
   <h1>My Group</h1>
@@ -235,6 +260,14 @@ export default{
   </div>
   
 </section>
+
+<section id="file_management">
+  <label for="file_title">Title</label><input type="text" id="file_title"><br>
+  <label for="file_description">Description</label><input type="text" id="file_description"><br>
+  <label for="file_tag">Tags</label><span class="badge bg-info text-dark">...</span> --- multi select<br>
+  <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
+</section>
+<button class="btn btn-default"  @click="logout">Logout</button>
 </template>
 
 <style scoped>
