@@ -108,6 +108,25 @@ export default{
       getDownloadURL(starsRef)
       .then((url)=>{
         console.log(url)
+        const xhr = new XMLHttpRequest()
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+          const blob = xhr.response;
+        };
+        xhr.onloadend = (event) => {
+          console.log(path)
+          console.log(event)
+          console.log(xhr)
+          const url = window.URL.createObjectURL(xhr.response);
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', path.slice(42));
+          document.body.appendChild(link);
+          link.click();
+        }
+        
+        xhr.open('GET', url);
+        xhr.send();
       })
       .catch((error) => {
         console.log(error)
