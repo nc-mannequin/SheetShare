@@ -233,22 +233,22 @@ export default{
       }
       else
       {
-        // const groupDocRef = doc(db,"group/"+group_key)
-        // var arr_member_id = []
-        // console.log(this.user_group.find(f => f[0] == group_key))
-        // arr_member_id = arr_member_id.concat(this.user_group.find(f => f[0] == group_key)[1].mem)
-        // const dataObj = {
-        //     members:arr_member_id.concat(this.member_text)
-        // }
-        // await updateDoc(groupDocRef, dataObj)
+        const groupDocRef = doc(db,"group/"+group_key)
+        var arr_member_id = []
+        console.log(this.user_group.find(f => f[0] == group_key))
+        arr_member_id = arr_member_id.concat(this.user_group.find(f => f[0] == group_key)[1].members)
+        const dataObj = {
+            members:arr_member_id.concat(this.member_text)
+        }
+        await updateDoc(groupDocRef, dataObj)
 
-        // const userDocRef = doc(db,"user/"+target_user.docs[0].id)
-        // var arr_group_id = []
-        // arr_group_id = arr_group_id.concat(target_user.docs[0].get("group_id"))
-        // const userDataObj = {
-        //   group_id: arr_group_id.concat(groupDocRef.id)
-        // }
-        // const updateRef = await updateDoc(userDocRef, userDataObj)
+        const userDocRef = doc(db,"user/"+target_user.docs[0].id)
+        var arr_group_id = []
+        arr_group_id = arr_group_id.concat(target_user.docs[0].get("group_id"))
+        const userDataObj = {
+          group_id: arr_group_id.concat(groupDocRef.id)
+        }
+        const updateRef = await updateDoc(userDocRef, userDataObj)
       }
     }
     
