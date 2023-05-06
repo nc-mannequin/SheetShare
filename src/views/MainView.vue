@@ -16,7 +16,8 @@ export default{
         group_text:"",
         user_group:[],
         own_materials:[],
-        group_member:[[]],
+        group_member:{},
+        member_text:""
     }
   },
   mounted () {
@@ -57,8 +58,12 @@ export default{
           target_group_members_id.forEach(async id => {
             const queryCondition = query(collection(db,"user"), where("user_id","==",id))
             const target_user = await getDocs(queryCondition)
-            console.log(index,id,this.group_member)
-            this.group_member[index] = this.group_member[index] == undefined ? [target_user.docs[0].data().display_name] : this.group_member[index].concat(target_user.docs[0].data().display_name)
+            const group_key = this.user_group[index][0]
+            const user_key = id
+            this.group_member[[group_key,user_key]] = target_user.docs[0].data().display_name
+            console.log(this.group_member)
+            // [this.user_group[index][0]][id] = target_user.docs[0].data().display_name
+            // this.group_member[this.user_group[index][0]][id] == undefined ? [target_user.docs[0].data().display_name] : this.group_member[this.user_group[index][0]].concat(target_user.docs[0].data().display_name)
           });
           
         }
@@ -79,6 +84,8 @@ export default{
                 this.isLoggedIn= false
             }
         })
+
+    // console.log(this.group_member['k40udYYsJqxLWJc2GyVd','OBCdVKibs0Q2kW6VT6OZnyAwsFj2'])
     
     
     
@@ -216,6 +223,33 @@ export default{
     },
     getFilePathFromFileId(fileId){
       return this.own_materials.find( file => file[0] == fileId )[1].file_url
+    },
+    async onAddMemberClick(group_key){
+      const db = getFirestore()
+      const queryCondition = query(collection(db,"user"), where("user_id","==",this.member_text))
+      const target_user = await getDocs(queryCondition)
+      if(target_user.empty){
+        alert("user not found.")
+      }
+      else
+      {
+        // const groupDocRef = doc(db,"group/"+group_key)
+        // var arr_member_id = []
+        // console.log(this.user_group.find(f => f[0] == group_key))
+        // arr_member_id = arr_member_id.concat(this.user_group.find(f => f[0] == group_key)[1].mem)
+        // const dataObj = {
+        //     members:arr_member_id.concat(this.member_text)
+        // }
+        // await updateDoc(groupDocRef, dataObj)
+
+        // const userDocRef = doc(db,"user/"+target_user.docs[0].id)
+        // var arr_group_id = []
+        // arr_group_id = arr_group_id.concat(target_user.docs[0].get("group_id"))
+        // const userDataObj = {
+        //   group_id: arr_group_id.concat(groupDocRef.id)
+        // }
+        // const updateRef = await updateDoc(userDocRef, userDataObj)
+      }
     }
     
 
@@ -263,9 +297,10 @@ export default{
     <h5>Members</h5>
     <ul>
       <li v-for="(member,member_index) in group[1].members">
-        {{ group_member[group_index][member_index] }}
+        {{ group_member[[group[0],member]] }}
       </li>
     </ul>
+    <input type="text" id="member_input" v-model="member_text"><button class="btn btn-default" @click="onAddMemberClick(group[0])">Add Member</button>
     <button class="btn btn-default" @click="onLeaveGroupClick(group[0])">Leave Group</button>
   </div>
   
