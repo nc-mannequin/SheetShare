@@ -1,7 +1,7 @@
 <script>
 import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
-import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc } from 'firebase/firestore'
+import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
 
 
 export default{
@@ -15,7 +15,8 @@ export default{
         file:{},
         group_text:"",
         user_group:[],
-        own_materials:[]
+        own_materials:[],
+        group_member:[[]],
     }
   },
   mounted () {
@@ -52,7 +53,16 @@ export default{
         for (let index = 0; index < this.user_group.length; index++) {
           console.log(this.user_group[index][0])
           console.log(this.user_group[index][1])
+          const target_group_members_id = this.user_group[index][1].members
+          target_group_members_id.forEach(async id => {
+            const queryCondition = query(collection(db,"user"), where("user_id","==",id))
+            const target_user = await getDocs(queryCondition)
+            console.log(index,id,this.group_member)
+            this.group_member[index] = this.group_member[index] == undefined ? [target_user.docs[0].data().display_name] : this.group_member[index].concat(target_user.docs[0].data().display_name)
+          });
+          
         }
+        console.log(this.group_member)
       })
       const materialColRef = collection(db,"material")
       onSnapshot(materialColRef,(snapShot) => {
@@ -247,13 +257,13 @@ export default{
   <h1>My Group</h1>
   <input type="text" v-model="group_text">
   <button class="btn btn-default" @click="onNewGroupClick()">New Group</button>
-  <div class="container" v-for="group in user_group">
-    <h1>{{ group[1].group_name }}</h1>
+  <div class="container" v-for="(group,group_index) in user_group">
+    <h1>{{ group_index }} {{ group[1].group_name }}</h1>
     <h3>{{ group[1].description }}</h3>
     <h5>Members</h5>
     <ul>
-      <li v-for="member in group[1].members">
-        {{ member }}
+      <li v-for="(member,member_index) in group[1].members">
+        {{ group_member[group_index][member_index] }}
       </li>
     </ul>
     <button class="btn btn-default" @click="onLeaveGroupClick(group[0])">Leave Group</button>
