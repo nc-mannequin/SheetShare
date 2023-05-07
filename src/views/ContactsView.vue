@@ -61,7 +61,7 @@ export default {
                             <h2 class="accordion-header" role="tab"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-1 .item-1" aria-expanded="false" aria-controls="accordion-1 .item-1">What is SheetShare?</button></h2>
                             <div class="accordion-collapse collapse item-1" role="tabpanel" data-bs-parent="#accordion-1">
                                 <div class="accordion-body">
-                                    <p><span style="color: rgb(55, 65, 81); background-color: rgb(247, 247, 248);">SheetShare is an online platform designed to facilitate the sharing and collaboration of educational resources.</span><br><br></p>
+                                    <p>SheetShare is an online platform designed to facilitate the sharing and collaboration of educational resources.</p>
                                 </div>
                             </div>
                         </div>

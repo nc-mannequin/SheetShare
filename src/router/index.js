@@ -7,6 +7,9 @@ import LogInView from '../views/LogInView.vue'
 import MainView from '../views/MainView.vue'
 
 const router = createRouter({
+  scrollBehavior(to, from, savedPosition) {
+    return { left: 0, top: 0 }
+  },
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
