@@ -35,7 +35,7 @@ export default{
           group_id:[],
           identifier_email:current_user.email,
           own_materials_id:[],
-          photo_url:"https://picsum.photos/200/300",
+          photo_url:"",
           updated_at:Timestamp.now(),
           user_id:current_user.uid
         }
@@ -279,6 +279,43 @@ export default{
 </script>
 
 <template>
+<body>
+  <nav class="navbar navbar-light navbar-expand-md fixed-top navbar-shrink py-3" id="mainNav">
+        <div class="container">
+          <a class="navbar-brand d-flex align-items-center"><RouterLink to="/main"><img src="/src/assets/img/Logo-SheetShare.png" width="40" height="40" alt="icon"><span> SheetShare</span></RouterLink></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+          <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><RouterLink to="/main"><a class="nav-link active">MAIN</a></RouterLink></li>
+                    <li class="nav-item"><RouterLink to="/main"><a class="nav-link">MAIN</a></RouterLink></li>
+                </ul>
+          </div>
+        </div>
+    </nav>
+    <section class="py-4 py-md-5 my-5">
+        <div class="container py-md-5">
+            <div class="row">
+              <div class="dropdown">
+                <button type="button" class="btn btn-default dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <div v-if="user?.photo_url != ''">
+                    <img :src=user.photo_url alt="user_img" class="close-image">
+                  </div>
+                  <div v-else>
+                    <button type="button" class="btn btn-primary shadow btn-circle btn-xl"><h2>{{ user?.display_name ? user.display_name.charAt(0) : "" }}</h2></button>
+                  </div>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Action</a></li>
+                  <li><a class="dropdown-item" href="#">Another action</a></li>
+                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                </ul>
+              </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+<br><br><br><br>
+
 <h1>This is the MAIN PAGE!</h1>
 <section name="user">
   <img :src=user.photo_url alt="user_img">
@@ -335,7 +372,17 @@ export default{
 </template>
 
 <style scoped>
+.btn-circle.btn-xl {
+  width: 70px;
+  height: 70px;
+  border-radius: 70px;
+  text-align: center;
+}
 
-
+.close-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 70px;
+}
 </style>
 

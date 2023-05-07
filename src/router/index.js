@@ -62,7 +62,12 @@ router.beforeEach(async (to, from, next) => {
       next('login')
     }
   } else {
-    next()
+    if(await getCurrentUser()){
+      console.log("You are authorized.");
+      next('main')
+    } else {
+      next()
+    }
   }
 })
 
