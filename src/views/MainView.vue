@@ -5,7 +5,7 @@ import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc,
 
 
 export default{
-  name: 'MainPage',
+  name: 'HomePage',
   data () {
     return {
         auth: getAuth(), 
@@ -20,7 +20,7 @@ export default{
         member_text:""
     }
   },
-  mounted () {
+  beforeMount () {
     const db = getFirestore()
     const colRef = collection(db,'user')
     onSnapshot(colRef, async snapShot => {
@@ -282,14 +282,14 @@ export default{
 <body>
   <nav class="navbar navbar-light navbar-expand-md fixed-top navbar-shrink py-2 mb-5" id="mainNav">
         <div class="container">
-          <a class="navbar-brand d-flex align-items-center"><RouterLink to="/main"><img src="/src/assets/img/Logo-SheetShare.png" width="40" height="40" alt="icon"><span> SheetShare</span></RouterLink></a>
+          <a class="navbar-brand d-flex align-items-center"><RouterLink to="/home"><img src="/src/assets/img/Logo-SheetShare.png" width="40" height="40" alt="icon"><span> SheetShare</span></RouterLink></a>
         </div>
     </nav>
     <section class="py-4 mt-5">
         <div class="container-fluid">
           <div class="row">
                 <div class="col-md-3 border-end">
-                  <div style="position: sticky; top: 80px;">
+                  <div style="position: sticky; top: 120px;">
                     <div class="card border-0">
                         <div class="card-body">
                         <div class="text-center">
@@ -310,9 +310,9 @@ export default{
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
-                                  <RouterLink to="/main">
+                                  <RouterLink to="/home">
                                     <span class="material-symbols-outlined mx-2 thispage">library_books</span>
-                                    Library
+                                    <span class="underline"><strong>Home</strong></span>
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
@@ -322,8 +322,7 @@ export default{
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
-                                  <!-- <RouterLink :to="{ name: 'profile',  params: { userId: userId }}"> -->
-                                  <RouterLink to="/main">
+                                  <RouterLink :to="{ name: 'profile', params: { userId: userId } }">
                                     <span class="material-symbols-outlined mx-2">person</span>
                                     Profile
                                   </RouterLink>
@@ -335,22 +334,27 @@ export default{
                     <div class="text-center mt-2">
                               <button type="button" class="btn btn-outline-danger" @click="logout">Logout</button>
                     </div>
+
+                    <br>
+                    <div class="mt-5 mb-5"></div>
+                    
                   </div>
                 </div>
 
                 <div class="col-md-9">
-                    <div class="row">
-                        <div class="col">
-                          <br><br><br><br><br><br><br><br><br><br>
-                          <br><br><br><br><br><br><br><br><br><br>
-                        </div>
-                    </div>
+                  wow
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
                 </div>
           </div>
         </div>
     </section>
     <footer>
-        <div class="container py-4 py-lg-5">
+        <div class="container py-2 py-lg-3">
             <div class="row row-cols-2 row-cols-md-4">
                 <div class="col-12 col-md-5">
                     <div class="fw-bold d-flex align-items-center mb-2"><span style="font-size: 30px;">SheetShare</span></div>
@@ -440,9 +444,15 @@ export default{
 .thispage {
   font-variation-settings:
   'FILL' 1,
-  'wght' 400,
+  'wght' 700,
   'GRAD' 0,
   'opsz' 48
+}
+
+.underline {
+  text-decoration-line: underline;
+  text-decoration-thickness: 8px;
+  text-decoration-color: #ffd200;
 }
 
 </style>

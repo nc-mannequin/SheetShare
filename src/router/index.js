@@ -15,7 +15,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'homepage',
       component: HomeView
     },
     {
@@ -33,8 +33,8 @@ const router = createRouter({
       redirect: '/login'
     },
     {
-      path: '/main',
-      name: 'main',
+      path: '/home',
+      name: 'home',
       component: MainView,
       meta: {
         requiresAuth: true
@@ -77,7 +77,7 @@ router.beforeEach(async (to, from, next) => {
   } else {
     if(await getCurrentUser()){
       console.log("You are authorized.");
-      next('main')
+      next('home')
     } else {
       next()
     }

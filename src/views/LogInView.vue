@@ -20,7 +20,7 @@ export default {
                     const user = result.user
                     console.log("User: "+ user)
                     console.log(credential,result)
-                    this.$router.replace("/main")
+                    this.$router.replace("/home")
                 })
                 .catch((error) => {
                     const errorCode = error.code
