@@ -45,28 +45,44 @@ export default {
         window.location.reload();
     },
     async onSaveClick() {
+        const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+        const appendAlert = (icon, messageone, messagetwo, messagethree, type) => {
+                const wrapper = document.createElement('div')
+                wrapper.innerHTML = [
+                    `<div class="alert alert-${type}" role="alert">`,
+                    `<span><span class="material-symbols-outlined mx-2">${icon}</span><span class="alert-heading h4"><strong>${messageone}</strong></span></span>`,
+                    '   <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>',
+                    `<p class="my-3">${messagetwo}</p>`,
+                    '<hr>',
+                    `<p class="mb-0">${messagethree}</p>`,
+                    '</div>'
+                ].join('')
+                
+                alertPlaceholder.append(wrapper)
+        }
+
         const display_name_textRGEX = /^[a-zA-Z0-9ก-๙]+([-_. ]?[a-zA-Z0-9ก-๙]+)*$/;
         const display_name_textResult = display_name_textRGEX.test(this.display_name_text);
 
-        if (this.display_name_text == "" || display_name_textResult == false){
-            this.display_name_text = this.user.display_name
-            alert('Invalid Display Name');
+        if (display_name_textResult == false){
+            appendAlert('error', 'Invalid Display Name', 'Display names can only contain English and Thai letters, numbers, spaces, hyphens, underscores, periods, or single spaces between words.', 'Please try again with a valid display name, or click on the cancel button to abort the operation.', 'danger')
         }
-
-        const db = getFirestore()
-        const docRef = doc(db, "user/"+this.userId)
-        const data = {
+        else{
+            const db = getFirestore()
+            const docRef = doc(db, "user/"+this.userId)
+            const data = {
                 display_name: this.display_name_text,
                 updated_at: Timestamp.now()
-        };
+            };
 
-        await updateDoc(docRef, data)
+            await updateDoc(docRef, data)
                 .then (()=>{
                     window.location.reload();
                 })
                 .catch((error)=>{
                     alert(error.message)
                 })
+        }
     },
     }
 }
@@ -178,11 +194,12 @@ export default {
                                     <input type="text" class="form-control" id="validationDefault02" name="displayname" pattern="^[a-zA-Z0-9ก-๙]+([\-_\. ]?[a-zA-Z0-9ก-๙]+)*$" maxlength="32" :placeholder="[[user.display_name]]" v-model="display_name_text" required>
                                 </div>
                             </form>
+                            <div class="row mt-4 mx-0" id="liveAlertPlaceholder"></div>
                             <div class="row">
-                                        <div class="text-center mt-4">
+                                <div class="text-center mt-4">
                                             <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancle</button>
                                             <button type="button" class="btn btn-primary shadow btn-sm" @click="onSaveClick">Save</button>
-                                        </div>
+                                </div>
                             </div>
                 </div>
           </div>
