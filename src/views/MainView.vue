@@ -280,95 +280,142 @@ export default{
 
 <template>
 <body>
-  <nav class="navbar navbar-light navbar-expand-md fixed-top navbar-shrink py-3" id="mainNav">
+  <nav class="navbar navbar-light navbar-expand-md fixed-top navbar-shrink py-2 mb-5" id="mainNav">
         <div class="container">
-          <a class="navbar-brand d-flex align-items-center"><RouterLink to="/main"><img src="/src/assets/img/Logo-SheetShare.png" width="40" height="40" alt="icon"><span> SheetShare</span></RouterLink></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-          <div class="collapse navbar-collapse" id="navcol-1">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><RouterLink to="/main"><a class="nav-link active">MAIN</a></RouterLink></li>
-                    <li class="nav-item"><RouterLink to="/main"><a class="nav-link">MAIN</a></RouterLink></li>
-                </ul>
-          </div>
+          <a class="navbar-brand d-flex align-items-center"><RouterLink to="/main"><img src="/src/assets/img/Logo-SheetShare.png" width="40" height="40" alt="icon"><span> SheetShare</span></RouterLink></a>
         </div>
     </nav>
-    <section class="py-4 py-md-5 my-5">
-        <div class="container py-md-5">
-            <div class="row">
-              <div class="dropdown">
-                <button type="button" class="btn btn-default dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  <div v-if="user?.photo_url != ''">
-                    <img :src=user.photo_url alt="user_img" class="close-image">
+    <section class="py-4 mt-5">
+        <div class="container-fluid">
+          <div class="row">
+                <div class="col-md-3 border-end">
+                  <div style="position: sticky; top: 80px;">
+                    <div class="card border-0">
+                        <div class="card-body">
+                        <div class="text-center">
+                          <h6><strong>{{ user.display_name }}</strong></h6>
+                        </div>
+                            <div class="text-center mt-3">
+                              <div v-if="user?.photo_url != ''">
+                                <img :src=user.photo_url alt="user_img" class="close-image">
+                              </div>
+                              <div v-else>
+                                <button class="btn btn-primary shadow btn-circle btn-xl btn-disabled"><h3 class="mt-2">{{ user?.display_name ? user.display_name.charAt(0) : "" }}</h3></button>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                  <RouterLink to="/main">
+                                    <span class="material-symbols-outlined mx-2 thispage">library_books</span>
+                                    Library
+                                  </RouterLink>
+                                </li>
+                                <li class="list-group-item">
+                                  <RouterLink to="/main">
+                                    <span class="material-symbols-outlined mx-2">group</span>
+                                    Group
+                                  </RouterLink>
+                                </li>
+                                <li class="list-group-item">
+                                  <!-- <RouterLink :to="{ name: 'profile',  params: { userId: userId }}"> -->
+                                  <RouterLink to="/main">
+                                    <span class="material-symbols-outlined mx-2">person</span>
+                                    Profile
+                                  </RouterLink>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-2">
+                              <button type="button" class="btn btn-outline-danger" @click="logout">Logout</button>
+                    </div>
                   </div>
-                  <div v-else>
-                    <button type="button" class="btn btn-primary shadow btn-circle btn-xl"><h2>{{ user?.display_name ? user.display_name.charAt(0) : "" }}</h2></button>
-                  </div>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Action</a></li>
-                  <li><a class="dropdown-item" href="#">Another action</a></li>
-                  <li><a class="dropdown-item" href="#">Something else here</a></li>
-                </ul>
-              </div>
-            </div>
+                </div>
+
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col">
+                          <br><br><br><br><br><br><br><br><br><br>
+                          <br><br><br><br><br><br><br><br><br><br>
+                        </div>
+                    </div>
+                </div>
+          </div>
         </div>
     </section>
+    <footer>
+        <div class="container py-4 py-lg-5">
+            <div class="row row-cols-2 row-cols-md-4">
+                <div class="col-12 col-md-5">
+                    <div class="fw-bold d-flex align-items-center mb-2"><span style="font-size: 30px;">SheetShare</span></div>
+                    <p class="text-muted">Collaborative platform and extensive library of educational resources.</p>
+                </div>
+            </div>
+            <hr>
+            <div class="text-muted d-flex justify-content-between align-items-center pt-3">
+                <p class="mb-0">Copyright © 2023 SheetShare</p>
+            </div>
+        </div>
+    </footer>
 </body>
+<!-- <h1>This is the MAIN PAGE!</h1>
+  <section name="user">
+      <img :src=user.photo_url alt="user_img">
+      <h1>{{ user.display_name }} </h1>
+      <h3>{{ user.identifier_email }}</h3>
+      <p>own material</p>
+      <ul>
+          <li v-for="fileId in user.own_materials_id">
+            {{ getFilenameFromId(fileId) }}
+            <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
+            <button class="btn btn-default"  @click="onDeleteFile(getFilePathFromFileId(fileId))">Delete</button>
+          </li>      
+      </ul>
+      <br>
+      <p>fav material</p>
+      <ul>
+          <li v-for="filename in user.fav_materials_id">
+            {{ filename.slice(42) }} 
+            <button class="btn btn-default"  @click="onDownloadFile(filename)">DownLoad</button>
+            <button class="btn btn-default"  @click="onDeleteFile(filename)">Delete</button>
+          </li>      
+      </ul>
 
-<br><br><br><br>
-
-<h1>This is the MAIN PAGE!</h1>
-<section name="user">
-  <img :src=user.photo_url alt="user_img">
-  <h1>{{ user.display_name }} </h1>
-  <h3>{{ user.identifier_email }}</h3>
-  <p>own material</p>
-  <ul>
-      <li v-for="fileId in user.own_materials_id">
-        {{ getFilenameFromId(fileId) }}
-        <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
-        <button class="btn btn-default"  @click="onDeleteFile(getFilePathFromFileId(fileId))">Delete</button>
-      </li>      
-  </ul>
-  <br>
-  <p>fav material</p>
-  <ul>
-      <li v-for="filename in user.fav_materials_id">
-        {{ filename.slice(42) }} 
-        <button class="btn btn-default"  @click="onDownloadFile(filename)">DownLoad</button>
-        <button class="btn btn-default"  @click="onDeleteFile(filename)">Delete</button>
-      </li>      
-  </ul>
-
-</section>
+    </section>
 
 
 
-<section>
-  <h1>My Group</h1>
-  <input type="text" v-model="group_text">
-  <button class="btn btn-default" @click="onNewGroupClick()">New Group</button>
-  <div class="container" v-for="(group,group_index) in user_group">
-    <h1>{{ group_index }} {{ group[1].group_name }}</h1>
-    <h3>{{ group[1].description }}</h3>
-    <h5>Members</h5>
-    <ul>
-      <li v-for="(member,member_index) in group[1].members">
-        {{ group_member[[group[0],member]] }}
-      </li>
-    </ul>
-    <input type="text" id="member_input" v-model="member_text"><button class="btn btn-default" @click="onAddMemberClick(group[0])">Add Member</button>
-    <button class="btn btn-default" @click="onLeaveGroupClick(group[0])">Leave Group</button>
-  </div>
+    <section>
+      <h1>My Group</h1>
+      <input type="text" v-model="group_text">
+      <button class="btn btn-default" @click="onNewGroupClick()">New Group</button>
+      <div class="container" v-for="(group, group_index) in user_group">
+        <h1>{{ group_index }} {{ group[1].group_name }}</h1>
+        <h3>{{ group[1].description }}</h3>
+        <h5>Members</h5>
+        <ul>
+          <li v-for="(member, member_index) in group[1].members">
+            {{ group_member[[group[0], member]] }}
+          </li>
+        </ul>
+        <input type="text" id="member_input" v-model="member_text"><button class="btn btn-default" @click="onAddMemberClick(group[0])">Add Member</button>
+        <button class="btn btn-default" @click="onLeaveGroupClick(group[0])">Leave Group</button>
+      </div>
   
-</section>
+    </section>
 
-<section id="file_management">
-  <label for="file_title">Title</label><input type="text" id="file_title"><br>
-  <label for="file_description">Description</label><input type="text" id="file_description"><br>
-  <label for="file_tag">Tags</label><span class="badge bg-info text-dark">...</span> --- multi select<br>
-  <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
-</section>
-<button class="btn btn-default"  @click="logout">Logout</button>
+    <section id="file_management">
+      <label for="file_title">Title</label><input type="text" id="file_title"><br>
+      <label for="file_description">Description</label><input type="text" id="file_description"><br>
+      <label for="file_tag">Tags</label><span class="badge bg-info text-dark">...</span> --- multi select<br>
+      <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
+    </section> -->
 </template>
 
 <style scoped>
@@ -384,5 +431,19 @@ export default{
   height: 70px;
   border-radius: 70px;
 }
+
+.btn-disabled{
+  opacity: 1;
+  cursor: default;
+}
+
+.thispage {
+  font-variation-settings:
+  'FILL' 1,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+
 </style>
 

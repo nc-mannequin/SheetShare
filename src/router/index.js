@@ -5,6 +5,7 @@ import HomeView from '../views/HomeView.vue'
 import ContactView from '../views/ContactsView.vue'
 import LogInView from '../views/LogInView.vue'
 import MainView from '../views/MainView.vue'
+import ProfileView from '../views/ProfileView.vue'
 
 const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
@@ -28,9 +29,21 @@ const router = createRouter({
       component: LogInView
     },
     {
+      path: '/:catchAll(.*)',
+      redirect: '/login'
+    },
+    {
       path: '/main',
       name: 'main',
       component: MainView,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/profile/:userId',
+      name: 'profile',
+      component: ProfileView,
       meta: {
         requiresAuth: true
       }

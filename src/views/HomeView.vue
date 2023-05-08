@@ -14,7 +14,7 @@ export default {
 
 <template>
 <body>
-  <nav class="navbar navbar-light navbar-expand-md fixed-top navbar-shrink py-3" id="mainNav">
+  <nav class="navbar navbar-light navbar-expand-md fixed-top navbar-shrink py-2" id="mainNav">
         <div class="container"><a class="navbar-brand d-flex align-items-center"><RouterLink to="/"><img src="/src/assets/img/Logo-SheetShare.png" width="40" height="40" alt="icon"><span> SheetShare</span></RouterLink></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
