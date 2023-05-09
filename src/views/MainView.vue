@@ -96,6 +96,7 @@ export default{
       signOut(this.auth) 
             .then (()=>{
                 this.$router.replace('/login')
+                window.location.reload();
             })
             .catch((error)=>{
                 alert(error.message)
@@ -289,11 +290,11 @@ export default{
         <div class="container-fluid">
           <div class="row">
                 <div class="col-md-3 border-end">
-                  <div style="position: sticky; top: 120px;">
+                  <div style="position: sticky; top: 80px;">
                     <div class="card border-0">
                         <div class="card-body">
                         <div class="text-center">
-                          <h6><strong>{{ user.display_name }}</strong></h6>
+                          <h3><strong>{{ user.display_name }}</strong></h3>
                         </div>
                             <div class="text-center mt-3">
                               <div v-if="user?.photo_url != ''">
@@ -331,8 +332,8 @@ export default{
                         </div>
                     </div>
 
-                    <div class="text-center mt-2">
-                              <button type="button" class="btn btn-outline-danger" @click="logout">Logout</button>
+                    <div class="d-grid gap-2 text-center mt-5 mx-4">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">Logout</button>
                     </div>
 
                     <br>
@@ -349,24 +350,43 @@ export default{
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <footer>
+                    <div class="container py-4 py-lg-5 mt-5">
+                      <div class="row row-cols-2 row-cols-md-4">
+                        <div class="col-12 col-md-5">
+                          <div class="fw-bold d-flex align-items-center mb-2"><span style="font-size: 30px;">SheetShare</span></div>
+                          <p class="text-muted">Collaborative platform and extensive library of educational resources.</p>
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="text-muted d-flex justify-content-between align-items-center pt-3">
+                        <p class="mb-0">Copyright © 2023 SheetShare</p>
+                      </div>
+                    </div>
+                    </footer>
                 </div>
           </div>
         </div>
     </section>
-    <footer>
-        <div class="container py-2 py-lg-3">
-            <div class="row row-cols-2 row-cols-md-4">
-                <div class="col-12 col-md-5">
-                    <div class="fw-bold d-flex align-items-center mb-2"><span style="font-size: 30px;">SheetShare</span></div>
-                    <p class="text-muted">Collaborative platform and extensive library of educational resources.</p>
-                </div>
+
+    <div class="modal fade" id="staticBackdrop-logout" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Logout</strong></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to logout?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancle</button>
+                <button type="button" class="btn btn-danger" @click="logout">Logout</button>
+              </div>
             </div>
-            <hr>
-            <div class="text-muted d-flex justify-content-between align-items-center pt-3">
-                <p class="mb-0">Copyright © 2023 SheetShare</p>
-            </div>
-        </div>
-    </footer>
+          </div>
+    </div>
+    
 </body>
 <!-- <h1>This is the MAIN PAGE!</h1>
   <section name="user">
@@ -424,16 +444,16 @@ export default{
 
 <style scoped>
 .btn-circle.btn-xl {
-  width: 70px;
-  height: 70px;
-  border-radius: 70px;
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
   text-align: center;
 }
 
 .close-image {
-  width: 70px;
-  height: 70px;
-  border-radius: 70px;
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
 }
 
 .btn-disabled{

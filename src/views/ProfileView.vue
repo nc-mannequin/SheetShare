@@ -11,6 +11,7 @@ export default {
         userId:"",
         user:{},
         display_name_text:"",
+        edit_display_name_error: false,
         }
     },
     beforeMount () {
@@ -36,6 +37,7 @@ export default {
             signOut(this.auth)
             .then (()=>{
                 this.$router.replace('/login')
+                window.location.reload();
             })
             .catch((error)=>{
                 alert(error.message)
@@ -51,7 +53,6 @@ export default {
                 wrapper.innerHTML = [
                     `<div class="alert alert-${type}" role="alert">`,
                     `<span><span class="material-symbols-outlined mx-2">${icon}</span><span class="alert-heading h4"><strong>${messageone}</strong></span></span>`,
-                    '   <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>',
                     `<p class="my-3">${messagetwo}</p>`,
                     '<hr>',
                     `<p class="mb-0">${messagethree}</p>`,
@@ -65,7 +66,13 @@ export default {
         const display_name_textResult = display_name_textRGEX.test(this.display_name_text);
 
         if (display_name_textResult == false){
-            appendAlert('error', 'Invalid Display Name', 'Display names can only contain English and Thai letters, numbers, spaces, hyphens, underscores, periods, or single spaces between words.', 'Please try again with a valid display name, or click on the cancel button to abort the operation.', 'danger')
+            if (this.edit_display_name_error == false){
+                appendAlert('error', 'Invalid Display Name', 'Display names can only contain English and Thai letters, numbers, spaces, hyphens, underscores, periods, or single spaces between words.', 'Please try again with a valid display name (until the check icon appears), or click on the cancel button to abort the operation.', 'danger')
+                this.edit_display_name_error = true
+            }
+            else {
+
+            }
         }
         else{
             const db = getFirestore()
@@ -84,6 +91,22 @@ export default {
                 })
         }
     },
+    async resetavatar() {
+        const db = getFirestore()
+        const docRef = doc(db, "user/"+this.userId)
+        const data = {
+                photo_url: "",
+                updated_at: Timestamp.now()
+        };
+
+        await updateDoc(docRef, data)
+                .then (()=>{
+                    window.location.reload();
+                })
+                .catch((error)=>{
+                    alert(error.message)
+                })
+    }
     }
 }
 </script>
@@ -99,11 +122,11 @@ export default {
         <div class="container-fluid">
           <div class="row">
                 <div class="col-md-3 border-end">
-                  <div style="position: sticky; top: 120px;">
+                  <div style="position: sticky; top: 80px;">
                     <div class="card border-0">
                         <div class="card-body">
                         <div class="text-center">
-                          <h6><strong>{{ user.display_name }}</strong></h6>
+                          <h3><strong>{{ user.display_name }}</strong></h3>
                         </div>
                             <div class="text-center mt-3">
                               <div v-if="user?.photo_url != ''">
@@ -141,8 +164,8 @@ export default {
                         </div>
                     </div>
 
-                    <div class="text-center mt-2">
-                              <button type="button" class="btn btn-outline-danger" @click="logout">Logout</button>
+                    <div class="d-grid gap-2 text-center mt-5 mx-4">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">Logout</button>
                     </div>
 
                     <br>
@@ -157,7 +180,8 @@ export default {
                     </div>
                             <div class="row mt-3" style="align-items: center;">
                                 <div class="col-md-4 text-center">
-                                    <div class="card border-0">
+                                    <div class="row">
+                                        <div class="card border-0">
                                         <div class="card-body">
                                             <div>
                                                 <div v-if="user?.photo_url != ''">
@@ -167,6 +191,12 @@ export default {
                                                     <button class="btn btn-primary shadow btn-circle btn-xl-edit btn-disabled"><h1 class="mt-2">{{ user?.display_name ? user.display_name.charAt(0) : "" }}</h1></button>
                                                 </div>
                                             </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="text-center mb-5 mt-2">
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Reset Avatar</button>
                                         </div>
                                     </div>
                                 </div>
@@ -178,7 +208,7 @@ export default {
                                     </div>
                                     <div class="row">
                                         <div class="text-end mt-2 pe-3">
-                                            <button type="button" class="btn btn-danger btn-sm mx-2">Reset</button>
+                                            <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancle</button>
                                             <button type="button" class="btn btn-primary shadow btn-sm">Upload</button>
                                         </div>
                                     </div>
@@ -201,40 +231,77 @@ export default {
                                             <button type="button" class="btn btn-primary shadow btn-sm" @click="onSaveClick">Save</button>
                                 </div>
                             </div>
+                            <footer>
+                                <div class="container py-4 py-lg-5 mt-5">
+                                    <div class="row row-cols-2 row-cols-md-4">
+                                        <div class="col-12 col-md-5">
+                                            <div class="fw-bold d-flex align-items-center mb-2"><span style="font-size: 30px;">SheetShare</span></div>
+                                            <p class="text-muted">Collaborative platform and extensive library of educational resources.</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="text-muted d-flex justify-content-between align-items-center pt-3">
+                                        <p class="mb-0">Copyright © 2023 SheetShare</p>
+                                    </div>
+                                </div>
+                            </footer>
                 </div>
           </div>
         </div>
     </section>
-    <footer>
-        <div class="container py-2 py-lg-3">
-            <div class="row row-cols-2 row-cols-md-4">
-                <div class="col-12 col-md-5">
-                    <div class="fw-bold d-flex align-items-center mb-2"><span style="font-size: 30px;">SheetShare</span></div>
-                    <p class="text-muted">Collaborative platform and extensive library of educational resources.</p>
-                </div>
+
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Reset Avatar</strong></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to reset your avatar to the default?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancle</button>
+                <button type="button" class="btn btn-danger" @click="resetavatar">Reset Avatar</button>
+              </div>
             </div>
-            <hr>
-            <div class="text-muted d-flex justify-content-between align-items-center pt-3">
-                <p class="mb-0">Copyright © 2023 SheetShare</p>
+          </div>
+    </div>
+
+    <div class="modal fade" id="staticBackdrop-logout" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Logout</strong></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to logout?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancle</button>
+                <button type="button" class="btn btn-danger" @click="logout">Logout</button>
+              </div>
             </div>
-        </div>
-    </footer>
+          </div>
+    </div>
+    
 </body>
 </template>
 
 <style scoped>
 
 .btn-circle.btn-xl {
-  width: 70px;
-  height: 70px;
-  border-radius: 70px;
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
   text-align: center;
 }
 
 .close-image {
-  width: 70px;
-  height: 70px;
-  border-radius: 70px;
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
 }
 
 .btn-disabled{
@@ -257,17 +324,24 @@ export default {
 }
 
 .btn-circle.btn-xl-edit {
-  width: 200px;
-  height: 200px;
-  border-radius: 200px;
+  width: 170px;
+  height: 170px;
+  border-radius: 170px;
   text-align: center;
 }
 
 .close-image-edit {
-  width: 200px;
-  height: 200px;
-  border-radius: 200px;
+  width: 170px;
+  height: 170px;
+  border-radius: 170px;
 }
+
+  input:required:valid {
+    background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%23198754' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z' clip-rule='evenodd'/></svg>");
+    background-position: right 1em center;
+    background-repeat: no-repeat;
+    background-size: 1.5rem 1.5rem;
+  }
 
 </style>
 
