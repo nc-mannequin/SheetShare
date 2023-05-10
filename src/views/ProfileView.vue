@@ -252,7 +252,7 @@ export default {
                                     </div>
                                     <div class="row">
                                         <div class="text-end mt-2 pe-3">
-                                            <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancle</button>
+                                            <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancel</button>
                                             <button type="button" class="btn btn-primary shadow btn-sm" @click="onProfileImgSubmit">Upload</button>
                                         </div>
                                     </div>
@@ -271,7 +271,7 @@ export default {
                             <div class="row mt-4 mx-0" id="liveAlertPlaceholder"></div>
                             <div class="row">
                                 <div class="text-center mt-4">
-                                            <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancle</button>
+                                            <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancel</button>
                                             <button type="button" class="btn btn-primary shadow btn-sm" @click="onSaveClick">Save</button>
                                 </div>
                             </div>
@@ -305,7 +305,7 @@ export default {
                 Are you sure you want to reset your avatar to the default?
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancle</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger" @click="resetavatar">Reset Avatar</button>
               </div>
             </div>
@@ -323,7 +323,7 @@ export default {
                 Are you sure you want to logout?
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancle</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger" @click="logout">Logout</button>
               </div>
             </div>

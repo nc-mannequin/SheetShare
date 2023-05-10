@@ -380,7 +380,7 @@ export default{
                 Are you sure you want to logout?
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancle</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger" @click="logout">Logout</button>
               </div>
             </div>
