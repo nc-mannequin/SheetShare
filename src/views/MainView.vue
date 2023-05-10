@@ -2,10 +2,13 @@
 import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
-
+import VuePdfEmbed from 'vue-pdf-embed'
 
 export default{
   name: 'HomePage',
+  components: {
+    VuePdfEmbed,
+  },
   data () {
     return {
         auth: getAuth(), 
@@ -86,8 +89,6 @@ export default{
         })
 
     // console.log(this.group_member['k40udYYsJqxLWJc2GyVd','OBCdVKibs0Q2kW6VT6OZnyAwsFj2'])
-    
-    
     
   },
   methods: {
@@ -270,7 +271,19 @@ export default{
         }
         const updateRef = await updateDoc(userDocRef, userDataObj)
       }
-    }
+    },
+    onPreviewFile(path){
+      // Create a reference to the file we want to Preview
+      const storage = getStorage();
+      const starsRef = ref(storage, path);
+      getDownloadURL(starsRef)
+      .then((url)=>{
+        console.log(url)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    },
     
 
       
@@ -344,6 +357,16 @@ export default{
 
                 <div class="col-md-9">
                   wow
+                  <p>own material</p>
+                  <ul>
+                    <li v-for="fileId in user.own_materials_id">
+                      {{ getFilenameFromId(fileId) }}
+                      <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
+                      <button class="btn btn-default"  @click="onDeleteFile(getFilePathFromFileId(fileId))">Delete</button>
+                      <!-- {{ onPreviewFile(getFilePathFromFileId(fileId)) }} -->
+                      <vue-pdf-embed :source=onPreviewFile(getFilePathFromFileId(fileId)) />
+                    </li>      
+                  </ul>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
