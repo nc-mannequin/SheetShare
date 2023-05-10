@@ -1,6 +1,7 @@
 <script>
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth'
 import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp } from 'firebase/firestore'
+import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 export default {
     name: 'Profile',
@@ -12,6 +13,7 @@ export default {
         user:{},
         display_name_text:"",
         edit_display_name_error: false,
+        file:{}
         }
     },
     beforeMount () {
@@ -106,7 +108,49 @@ export default {
                 .catch((error)=>{
                     alert(error.message)
                 })
-    }
+    },
+    onProfileImgUpload(event){
+      if(event.target.files[0] != null && event.target.files[0] != undefined){
+        this.file = event.target.files[0]
+        var reader = new FileReader();
+        reader.readAsDataURL(event.target.files[0])
+        setTimeout(()=>{
+          var target_change = document.getElementById("user_image")
+          if(target_change != null){
+            document.getElementById("user_image").src = reader.result
+          }
+          else
+          {
+            var target_change_if_not_exist = document.getElementById("user_image_default")
+            var preview_image = document.createElement("img");
+            preview_image.alt = "user_img"
+            preview_image.style = "width: 170px; height: 170px; border-radius: 170px;"
+            preview_image.id = "user_image"
+            preview_image.src = reader.result;
+            target_change_if_not_exist.childNodes[0].replaceWith(preview_image)  
+          }
+        },100)
+        
+      }
+    },
+    onProfileImgSubmit(){
+      const storage = getStorage();
+      const url = this.user.user_id.concat("/profile/",Date.now().toString(),this.file.name)
+      const storageRef = ref(storage, url);
+      uploadBytes(storageRef, this.file)
+      .then(async ()=>{
+        getDownloadURL(storageRef)
+        .then(async (download_url)=>{
+          const db = getFirestore()
+          const userDocRef = doc(db,"user/"+this.userId)
+          const changeDetail = {
+            photo_url : download_url
+          }
+          await updateDoc(userDocRef, changeDetail)
+        })
+      })
+    },
+    
     }
 }
 </script>
@@ -155,7 +199,7 @@ export default {
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
-                                  <RouterLink :to="{ name: 'profile', params: { userId: userId } }">
+                                  <RouterLink to="/profile">
                                     <span class="material-symbols-outlined mx-2 thispage">person</span>
                                     <span class="underline"><strong>Profile</strong></span>
                                   </RouterLink>
@@ -185,9 +229,9 @@ export default {
                                         <div class="card-body">
                                             <div>
                                                 <div v-if="user?.photo_url != ''">
-                                                    <img :src=user.photo_url alt="user_img" class="close-image-edit">
+                                                    <img :src=user.photo_url alt="user_img" class="close-image-edit" id="user_image">
                                                 </div>
-                                                <div v-else>
+                                                <div v-else id="user_image_default">
                                                     <button class="btn btn-primary shadow btn-circle btn-xl-edit btn-disabled"><h1 class="mt-2">{{ user?.display_name ? user.display_name.charAt(0) : "" }}</h1></button>
                                                 </div>
                                             </div>
@@ -203,13 +247,13 @@ export default {
                                 <div class="col-md-8">
                                     <div class="row">
                                         <div class="input-group px-3">
-                                            <input type="file" class="form-control" id="inputGroupFile01">
+                                            <input type="file" accept="image/png, image/jpeg" class="form-control" id="inputGroupFile01" @change="onProfileImgUpload">
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="text-end mt-2 pe-3">
                                             <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancle</button>
-                                            <button type="button" class="btn btn-primary shadow btn-sm">Upload</button>
+                                            <button type="button" class="btn btn-primary shadow btn-sm" @click="onProfileImgSubmit">Upload</button>
                                         </div>
                                     </div>
                                 </div>

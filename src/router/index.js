@@ -41,7 +41,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/profile/:userId',
+      path: '/profile',
       name: 'profile',
       component: ProfileView,
       meta: {

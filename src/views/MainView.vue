@@ -323,7 +323,7 @@ export default{
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
-                                  <RouterLink :to="{ name: 'profile', params: { userId: userId } }">
+                                  <RouterLink to="/profile">
                                     <span class="material-symbols-outlined mx-2">person</span>
                                     Profile
                                   </RouterLink>
