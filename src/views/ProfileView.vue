@@ -124,7 +124,7 @@ export default {
             var target_change_if_not_exist = document.getElementById("user_image_default")
             var preview_image = document.createElement("img");
             preview_image.alt = "user_img"
-            preview_image.style = "width: 170px; height: 170px; border-radius: 170px;"
+            preview_image.style = "width: 170px; height: 170px; border-radius: 170px; object-fit: cover;"
             preview_image.id = "user_image"
             preview_image.src = reader.result;
             target_change_if_not_exist.childNodes[0].replaceWith(preview_image)  
@@ -364,6 +364,7 @@ export default {
   width: 100px;
   height: 100px;
   border-radius: 100px;
+  object-fit: cover;
 }
 
 .btn-disabled{
@@ -396,6 +397,7 @@ export default {
   width: 170px;
   height: 170px;
   border-radius: 170px;
+  object-fit: cover;
 }
 
   input:required:valid {
