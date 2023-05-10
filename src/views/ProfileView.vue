@@ -252,7 +252,7 @@ export default {
                                     </div>
                                     <div class="row">
                                         <div class="text-end mt-2 pe-3">
-                                            <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancel</button>
+                                          <button type="button" class="btn btn-danger btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop-cancel">Cancel</button>
                                             <button type="button" class="btn btn-primary shadow btn-sm" @click="onProfileImgSubmit">Upload</button>
                                         </div>
                                     </div>
@@ -271,7 +271,7 @@ export default {
                             <div class="row mt-4 mx-0" id="liveAlertPlaceholder"></div>
                             <div class="row">
                                 <div class="text-center mt-4">
-                                            <button type="button" class="btn btn-danger btn-sm mx-2" @click="refreshpage">Cancel</button>
+                                            <button type="button" class="btn btn-danger btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop-cancel">Cancel</button>
                                             <button type="button" class="btn btn-primary shadow btn-sm" @click="onSaveClick">Save</button>
                                 </div>
                             </div>
@@ -325,6 +325,24 @@ export default {
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger" @click="logout">Logout</button>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <div class="modal fade" id="staticBackdrop-cancel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Cancel Confirmation</strong></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to cancel? Any unsaved progress will be lost.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" @click="refreshpage">Yes</button>
               </div>
             </div>
           </div>
