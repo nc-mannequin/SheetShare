@@ -424,6 +424,12 @@ export default{
                       {{ material[1].title }}
                       <button class="btn btn-default"  @click="onDownloadFile(material[1].file_url)">DownLoad</button>
                       <button class="btn btn-default"  @click="onDeleteFile(material[0])">Delete</button>
+                      <RouterLink :to="{path:'/edit_file', name:'edit_file', params: { file_doc_ref :material[0]} }"  >
+                        <button class="btn btn-default">Edit</button>
+                      </RouterLink>
+                      
+                      
+                      
                       <div v-if="material[2] != undefined">
                         <vue-pdf-embed :source=material[2] height="200" :disable-text-layer=true :page="1" />
                       </div>
@@ -533,7 +539,7 @@ export default{
       <label for="file_tag">Tags</label><span class="badge bg-info text-dark">...</span> --- multi select<br>
       <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
     </section> -->
-    <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
+    <!-- <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button> -->
 </template>
 
 <style scoped>

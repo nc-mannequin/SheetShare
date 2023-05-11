@@ -6,6 +6,7 @@ import ContactView from '../views/ContactsView.vue'
 import LogInView from '../views/LogInView.vue'
 import MainView from '../views/MainView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import EditFileView from '../views/EditFileView.vue'
 
 const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
@@ -48,6 +49,14 @@ const router = createRouter({
         requiresAuth: true
       }
     },
+    {
+      path: '/edit_file/:file_doc_ref',
+      name: 'edit_file',
+      component: EditFileView,
+      meta: {
+        requiresAuth: true
+      }
+    },
   ]
 })
 
@@ -65,6 +74,7 @@ const getCurrentUser = () =>{
 }
 
 router.beforeEach(async (to, from, next) => {
+  console.log(from,to)
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   if (requiresAuth) {
     if(await getCurrentUser()){
