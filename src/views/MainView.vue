@@ -537,6 +537,10 @@ export default{
 </template>
 
 <style scoped>
+
+body {
+    font-family: 'Chakra Petch', sans-serif;
+}
 .btn-circle.btn-xl {
   width: 100px;
   height: 100px;
@@ -548,6 +552,7 @@ export default{
   width: 100px;
   height: 100px;
   border-radius: 100px;
+  object-fit: cover;
 }
 
 .btn-disabled{

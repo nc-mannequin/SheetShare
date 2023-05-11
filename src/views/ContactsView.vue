@@ -113,6 +113,10 @@ export default {
 
 <style scoped>
 
+body {
+    font-family: 'Chakra Petch', sans-serif;
+}
+
 .underline {
   text-decoration-line: underline;
   text-decoration-thickness: 8px;

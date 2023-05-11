@@ -13,6 +13,7 @@ export default {
         user:{},
         display_name_text:"",
         edit_display_name_error: false,
+        file_error: false,
         file:{}
         }
     },
@@ -69,7 +70,7 @@ export default {
 
         if (display_name_textResult == false){
             if (this.edit_display_name_error == false){
-                appendAlert('error', 'Invalid Display Name', 'Display names can only contain English and Thai letters, numbers, spaces, hyphens, underscores, periods, or single spaces between words.', 'Please try again with a valid display name (until the check icon appears), or click on the cancel button to abort the operation.', 'danger')
+                appendAlert('error', 'Invalid Display Name', 'Display name can only contain English and Thai letters, numbers, spaces, hyphens, underscores, periods, or single spaces between words.', 'Please try again with a valid display name (until the check icon appears), or click on the cancel button to abort the operation.', 'danger')
                 this.edit_display_name_error = true
             }
             else {
@@ -110,7 +111,11 @@ export default {
                 })
     },
     onProfileImgUpload(event){
-      if(event.target.files[0] != null && event.target.files[0] != undefined){
+      const fileTypes = [
+        "image/jpeg",
+        "image/png",
+      ];
+      if(event.target.files[0] != null && event.target.files[0] != undefined && (fileTypes.includes(event.target.files[0].type)) != false){
         this.file = event.target.files[0]
         var reader = new FileReader();
         reader.readAsDataURL(event.target.files[0])
@@ -129,12 +134,31 @@ export default {
             preview_image.src = reader.result;
             target_change_if_not_exist.childNodes[0].replaceWith(preview_image)  
           }
-        },100)
-        
+        },100)      
       }
     },
     onProfileImgSubmit(){
-      if(this.file.name != undefined && this.file.name != null){
+      const fileTypes = [
+        "image/jpeg",
+        "image/png",
+      ];
+
+      const alertPlaceholder = document.getElementById('liveAlertPlaceholder-File')
+        const appendAlert = (icon, messageone, messagetwo, messagethree, type) => {
+                const wrapper = document.createElement('div')
+                wrapper.innerHTML = [
+                    `<div class="alert alert-${type}" role="alert">`,
+                    `<span><span class="material-symbols-outlined mx-2">${icon}</span><span class="alert-heading h4"><strong>${messageone}</strong></span></span>`,
+                    `<p class="my-3">${messagetwo}</p>`,
+                    '<hr>',
+                    `<p class="mb-0">${messagethree}</p>`,
+                    '</div>'
+                ].join('')
+                
+                alertPlaceholder.append(wrapper)
+        }
+
+      if(this.file.name != undefined && this.file.name != null && (fileTypes.includes(this.file.type)) != false){
         const storage = getStorage();
         const url = this.user.user_id.concat("/profile/",Date.now().toString(),this.file.name)
         const storageRef = ref(storage, url);
@@ -153,7 +177,13 @@ export default {
       }
       else
       {
-        alert('Dafuq u want? Hit upload without upload. U fcking psycho')
+        if (this.file_error == false){
+                appendAlert('error', 'Invalid File Type or No Avatar Image File', 'Avatar image file with the following extensions are allowed: .jpg, .jpeg, .png', 'Please try again with a valid avatar image, or click on the cancel button to abort the operation.', 'danger')
+                this.file_error = true
+            }
+        else{
+
+        }
       }
     },
     
@@ -253,13 +283,14 @@ export default {
                                 <div class="col-md-8">
                                     <div class="row">
                                         <div class="input-group px-3">
-                                            <input type="file" accept="image/png, image/jpeg" class="form-control" id="inputGroupFile01" @change="onProfileImgUpload">
+                                          <input type="file" accept="image/png, image/jpeg" class="form-control" id="inputGroupFile01" @change="onProfileImgUpload">
                                         </div>
                                     </div>
+                                    <div class="row mt-4 px-1" id="liveAlertPlaceholder-File"></div>
                                     <div class="row">
                                         <div class="text-end mt-2 pe-3">
                                           <button type="button" class="btn btn-danger btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop-cancel">Cancel</button>
-                                            <button type="button" class="btn btn-primary shadow btn-sm" @click="onProfileImgSubmit">Upload</button>
+                                          <button type="button" class="btn btn-primary shadow btn-sm" @click="onProfileImgSubmit">Upload</button>
                                         </div>
                                     </div>
                                 </div>
@@ -358,6 +389,10 @@ export default {
 </template>
 
 <style scoped>
+
+body {
+    font-family: 'Chakra Petch', sans-serif;
+}
 
 .btn-circle.btn-xl {
   width: 100px;
