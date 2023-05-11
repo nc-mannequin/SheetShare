@@ -229,7 +229,7 @@ export default {
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
-                                  <RouterLink to="/main">
+                                  <RouterLink to="/group">
                                     <span class="material-symbols-outlined mx-2">group</span>
                                     Group
                                   </RouterLink>
