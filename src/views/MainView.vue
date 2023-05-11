@@ -75,6 +75,12 @@ export default{
       const materialColRef = collection(db,"material")
       onSnapshot(materialColRef,(snapShot) => {
         this.own_materials = snapShot.docs.map(doc => [doc.id,doc.data()]).filter(f => this.user.own_materials_id.includes(f[0]))
+        this.own_materials.forEach((material) => {
+          const storage = getStorage();
+          const fileRef = ref(storage, material[1].file_url);
+          getDownloadURL(fileRef).then((url) => {material[2] = url})
+        })
+        console.log(this.own_materials)
       })
     },(err)=>{console.log(err)})
 
@@ -105,6 +111,7 @@ export default{
     },
     onDownloadFile(path){
       // Create a reference to the file we want to download
+      console.log(path)
       const storage = getStorage();
       const starsRef = ref(storage, path);
       getDownloadURL(starsRef)
@@ -182,14 +189,17 @@ export default{
       document.getElementById("file_upload").value = ""
       
     },
-    async onDeleteFile(url){
+    async onDeleteFile(docRefId){
+      console.log("on delete =>",docRefId)
       const db = getFirestore()
       const docRef = doc(db,"user/"+this.userId)
       var arr_id = []
       arr_id = arr_id.concat(this.user.own_materials_id)
+      console.log(arr_id)
       const dataObj = {
-        own_materials_id: arr_id.filter(f => f!=url)
+        own_materials_id: arr_id.filter(f => f!=docRefId)
       }
+      console.log(dataObj)
       const updateRef = await updateDoc(docRef, dataObj)
     },
     async onNewGroupClick(){
@@ -272,17 +282,29 @@ export default{
         const updateRef = await updateDoc(userDocRef, userDataObj)
       }
     },
-    onPreviewFile(path){
+    onPreviewFile(fileId){
+      console.log(fileId)
+      var target = this.own_materials.find(id => id[0] == fileId)
+      if(target){
+        target = target[1].file_url
+      }
+      var url_for_source = ""
+      console.log(target)
       // Create a reference to the file we want to Preview
       const storage = getStorage();
-      const starsRef = ref(storage, path);
-      getDownloadURL(starsRef)
+      const starsRef = ref(storage, target);
+      const result = getDownloadURL(starsRef)
       .then((url)=>{
-        console.log(url)
+        const canvas = document.getElementById(fileId)
+        console.log(canvas)
+        canvas.source = url
+        url_for_source = url
+        console.log(url_for_source)
       })
       .catch((error) => {
         console.log(error)
       })
+      console.log(url_for_source)
     },
     
 
@@ -359,12 +381,20 @@ export default{
                   wow
                   <p>own material</p>
                   <ul>
-                    <li v-for="fileId in user.own_materials_id">
-                      {{ getFilenameFromId(fileId) }}
+                    <li v-for="material in own_materials">
+                      <!-- {{ material }} <br> -->
+                      {{ material[1].title }}
+                      <button class="btn btn-default"  @click="onDownloadFile(material[1].file_url)">DownLoad</button>
+                      <button class="btn btn-default"  @click="onDeleteFile(material[0])">Delete</button>
+                      <vue-pdf-embed :source=material[2] height="200"/>
+                      <!-- {{ getFilenameFromId(fileId) }}
                       <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
-                      <button class="btn btn-default"  @click="onDeleteFile(getFilePathFromFileId(fileId))">Delete</button>
+                      <button class="btn btn-default"  @click="onDeleteFile(fileId)">Delete</button> -->
                       <!-- {{ onPreviewFile(getFilePathFromFileId(fileId)) }} -->
-                      <vue-pdf-embed :source=onPreviewFile(getFilePathFromFileId(fileId)) />
+                      <!-- <vue-pdf-embed :source="onPreviewFile(fileId) ? onPreviewFile(fileId):''" :id=fileId /> -->
+                      <!-- <vue-pdf-embed :id=fileId /> -->
+                      <!-- <vue-pdf-embed source="https://firebasestorage.googleapis.com/v0/b/sheetshare-7e0d8.appspot.com/o/OBCdVKibs0Q2kW6VT6OZnyAwsFj2%2F1683355781183ResumeButFromWatek%20(1).pdf?alt=media&token=754b2e1c-bf99-48f8-b387-5faeac282d2b" :id=fileId /> -->
+                      
                     </li>      
                   </ul>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -463,6 +493,7 @@ export default{
       <label for="file_tag">Tags</label><span class="badge bg-info text-dark">...</span> --- multi select<br>
       <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
     </section> -->
+    <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
 </template>
 
 <style scoped>
