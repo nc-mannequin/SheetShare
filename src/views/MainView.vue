@@ -20,7 +20,13 @@ export default{
         user_group:[],
         own_materials:[],
         group_member:{},
-        member_text:""
+        member_text:"",
+        master_data:{},
+        upload_file_detail:{
+          level:"",
+          subject:"",
+          description:""
+        }
     }
   },
   beforeMount () {
@@ -70,7 +76,6 @@ export default{
           });
           
         }
-        console.log(this.group_member)
       })
       const materialColRef = collection(db,"material")
       onSnapshot(materialColRef,(snapShot) => {
@@ -80,10 +85,15 @@ export default{
           const fileRef = ref(storage, material[1].file_url);
           getDownloadURL(fileRef).then((url) => {material[2] = url})
         })
-        console.log(this.own_materials)
       })
     },(err)=>{console.log(err)})
 
+    const MasterDataColRef = collection(db,"master_data")
+    onSnapshot(MasterDataColRef
+    ,(snapShot) => {
+      this.master_data = snapShot.docs.map(doc => doc.data())
+    }
+    ,(err) => {console.log(err)})
     
 
     onAuthStateChanged(this.auth, (user) => {
@@ -148,44 +158,51 @@ export default{
     onUploadSubmit(event){
       console.log(this.file)
       console.log(event)
-      for (let index = 0; index < this.file.length; index++) {
-        const afile = this.file[index];
-
-        if(afile.name!=undefined){
-        const storage = getStorage();
-        const url = this.user.user_id.concat("/",Date.now().toString(),afile.name)
-        const storageRef = ref(storage, url);
-        uploadBytes(storageRef, afile)
-        .then(async (snapshot)=>{
-          console.log(snapshot.metadata)
-          const db = getFirestore()
-
-          const materialDocRef = doc(collection(db,"material"))
-          const materialDataObj = {
-            comments:[],
-            created_at: Timestamp.now(),
-            description:"",
-            file_url:snapshot.metadata.fullPath,
-            level:"test",
-            likes:[],
-            subject:"test",
-            tags:[],
-            title:snapshot.metadata.fullPath.slice(42),
-            user_id:this.user.user_id
-          }
-          await setDoc(materialDocRef, materialDataObj)
-
-          const userDocRef = doc(db,"user/"+this.userId)
-          var arr_id = []
-          arr_id = arr_id.concat(this.user.own_materials_id)
-          const dataObj = {
-            own_materials_id: arr_id.concat(materialDocRef.id)
-          }
-          await updateDoc(userDocRef, dataObj)
-        })
+      if(this.upload_file_detail.description == "" || this.upload_file_detail.level == "" || this.upload_file_detail.subject == ""){
+        alert("please fill out the form. u buffoon.")
       }
-        
+      else
+      {
+        for (let index = 0; index < this.file.length; index++) {
+          const afile = this.file[index];
+          if(afile.name!=undefined ){
+          const storage = getStorage();
+          const url = this.user.user_id.concat("/",Date.now().toString(),afile.name)
+          const storageRef = ref(storage, url);
+          uploadBytes(storageRef, afile)
+          .then(async (snapshot)=>{
+            console.log(snapshot.metadata)
+            const db = getFirestore()
+            const materialDocRef = doc(collection(db,"material"))
+            const materialDataObj = {
+              comments:[],
+              created_at: Timestamp.now(),
+              description:this.upload_file_detail.description,
+              file_url:snapshot.metadata.fullPath,
+              level:this.upload_file_detail.level,
+              likes:[],
+              subject:this.upload_file_detail.subject,
+              tags:[],
+              title:snapshot.metadata.fullPath.slice(42),
+              user_id:this.user.user_id
+            }
+            await setDoc(materialDocRef, materialDataObj).then(()=>{
+              this.upload_file_detail.level = ""
+              this.upload_file_detail.subject = ""
+              this.upload_file_detail.description = ""
+            })
+            const userDocRef = doc(db,"user/"+this.userId)
+            var arr_id = []
+            arr_id = arr_id.concat(this.user.own_materials_id)
+            const dataObj = {
+              own_materials_id: arr_id.concat(materialDocRef.id)
+            }
+            await updateDoc(userDocRef, dataObj)
+          })
+        }
       }
+      }
+      
       document.getElementById("file_upload").value = ""
       
     },
@@ -378,7 +395,28 @@ export default{
                 </div>
 
                 <div class="col-md-9">
-                  wow
+                  <h1 class="mb-3">Upload file</h1>
+                  <label for="formFileMultiple" class="form-label"><h3>Choose file(s) to upload.</h3></label>
+                  <input class="form-control mb-3" id="file_upload" type="file" multiple @change="onUploadChange">
+                  
+
+                  <label for="levelDataList" class="form-label"><h3>Level</h3></label>
+                  <input class="form-control mb-3" list="leveldatalistOptions" id="levelDataList" placeholder="Type to search..." v-model="upload_file_detail.level">
+                  <datalist id="leveldatalistOptions">
+                    <option v-for="level in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'level').options : []" :value=level></option>
+                  </datalist>
+
+                  <label for="subjectDataList" class="form-label"><h3>Subject</h3></label>
+                  <input class="form-control mb-3" list="subjectdatalistOptions" id="subjectDataList" placeholder="Type to search..." v-model="upload_file_detail.subject">
+                  <datalist id="subjectdatalistOptions">
+                    <option v-for="subject in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'subject').options : []" :value=subject></option>
+                  </datalist>
+
+                  <label for="descriptionTextarea" class="form-label"><h3>Description</h3></label><br>
+                  <textarea class="w-100" id="descriptionTextarea" rows="3" v-model="upload_file_detail.description"></textarea><br>
+
+                  <button class="btn btn-outline-primary" type="button" @click="onUploadSubmit">Submit</button>
+
                   <p>own material</p>
                   <ul>
                     <li v-for="material in own_materials">
@@ -386,7 +424,9 @@ export default{
                       {{ material[1].title }}
                       <button class="btn btn-default"  @click="onDownloadFile(material[1].file_url)">DownLoad</button>
                       <button class="btn btn-default"  @click="onDeleteFile(material[0])">Delete</button>
-                      <vue-pdf-embed :source=material[2] height="200"/>
+                      <div v-if="material[2] != undefined">
+                        <vue-pdf-embed :source=material[2] height="200" :disable-text-layer=true :page="1" />
+                      </div>
                       <!-- {{ getFilenameFromId(fileId) }}
                       <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
                       <button class="btn btn-default"  @click="onDeleteFile(fileId)">Delete</button> -->
