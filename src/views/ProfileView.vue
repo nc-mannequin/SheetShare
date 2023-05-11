@@ -134,21 +134,27 @@ export default {
       }
     },
     onProfileImgSubmit(){
-      const storage = getStorage();
-      const url = this.user.user_id.concat("/profile/",Date.now().toString(),this.file.name)
-      const storageRef = ref(storage, url);
-      uploadBytes(storageRef, this.file)
-      .then(async ()=>{
-        getDownloadURL(storageRef)
-        .then(async (download_url)=>{
-          const db = getFirestore()
-          const userDocRef = doc(db,"user/"+this.userId)
-          const changeDetail = {
-            photo_url : download_url
-          }
-          await updateDoc(userDocRef, changeDetail)
+      if(this.file.name != undefined && this.file.name != null){
+        const storage = getStorage();
+        const url = this.user.user_id.concat("/profile/",Date.now().toString(),this.file.name)
+        const storageRef = ref(storage, url);
+        uploadBytes(storageRef, this.file)
+        .then(async ()=>{
+          getDownloadURL(storageRef)
+          .then(async (download_url)=>{
+            const db = getFirestore()
+            const userDocRef = doc(db,"user/"+this.userId)
+            const changeDetail = {
+              photo_url : download_url
+            }
+            await updateDoc(userDocRef, changeDetail)
+          })
         })
-      })
+      }
+      else
+      {
+        alert('Dafuq u want? Hit upload without upload. U fcking psycho')
+      }
     },
     
     }
