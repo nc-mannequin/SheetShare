@@ -30,7 +30,7 @@ export default{
         allPublicFile:{},
     }
   },
-  beforeMount () {
+  async beforeMount () {
     const db = getFirestore()
     const colRef = collection(db,'user')
     onSnapshot(colRef, async snapShot => {
@@ -97,6 +97,15 @@ export default{
     ,(err) => {console.log(err)})
     
     const materialColRef = collection(db,"material")
+
+    // const allFileQueryCondition = query(collection(db,"material"))
+    // this.allPublicFile = (await getDocs(allFileQueryCondition)).docs.map(doc => doc.data())
+    // this.allPublicFile.forEach((material)=>{
+    //     const storage = getStorage();
+    //     const fileRef = ref(storage, material.file_url);
+    //     getDownloadURL(fileRef).then((url) => {material.source = url})
+    //   })
+
     onSnapshot(materialColRef,
     (snapShot) => {
       this.allPublicFile = snapShot.docs.map(doc => doc.data())
