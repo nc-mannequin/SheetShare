@@ -501,7 +501,7 @@ export default{
                       <h4 class="underline"><strong>My Materials</strong></h4>
                     </div>
                     <div class="container mt-4">
-                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
                           <MyFileComponent v-for="material, i in own_materials" :material="material" :key="i"></MyFileComponent>
                         </div>
                       </div>
@@ -511,7 +511,7 @@ export default{
                       <h4 class="underline"><strong>My Favourited</strong></h4>
                     </div>
                     <div class="container mt-4">
-                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
                           เร็ว ๆ นี้เนาะ ใจเย็นดิเตง
                         </div>
                       </div>

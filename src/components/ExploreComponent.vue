@@ -18,19 +18,25 @@ export default {
 </script>
 
 <template>
-    <div class="col-md-6 col-lg-4 d-flex">
-        <div class="card">
-            <div class="card-header">
-                <vue-pdf-embed :source=file.source :disable-text-layer="true" :page="1" />
-            </div>
-            <div class="card-body">
-                <div class="row text-center my-4">
-                    <h6 class="card-title"><strong>{{ file.title }}</strong></h6>
+        <div class="col">
+        <div class="card mb-3 h-100 border border-warning">
+            <div class="row">
+                <div class="col-md-6">
+                    <div v-if="file.source != undefined">
+                        <vue-pdf-embed :source=file.source :disable-text-layer="true" :page="1" />
+                    </div>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><small><span><b>level: </b>{{ file.level }}</span></small></li>
-                    <li class="list-group-item"><small><span><b>Subject: </b>{{ file.subject }}</span></small></li>
-                </ul>
+                <div class="col-md-6">
+                  <div class="card-body">
+                    <div class="row my-4 text-center">
+                        <h5 class="card-title"><strong>{{ file.title }}</strong></h5>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><small><span><b>level: </b>{{ file.level }}</span></small></li>
+                        <li class="list-group-item"><small><span><b>Subject: </b>{{ file.subject }}</span></small></li>
+                    </ul>
+                  </div>
+                </div>
             </div>
         </div>
     </div>
