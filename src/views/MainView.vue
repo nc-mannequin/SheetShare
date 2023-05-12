@@ -26,7 +26,8 @@ export default{
           level:"",
           subject:"",
           description:""
-        }
+        },
+        allPublicFile:{},
     }
   },
   beforeMount () {
@@ -95,6 +96,19 @@ export default{
     }
     ,(err) => {console.log(err)})
     
+    const materialColRef = collection(db,"material")
+    onSnapshot(materialColRef,
+    (snapShot) => {
+      this.allPublicFile = snapShot.docs.map(doc => doc.data())
+      this.allPublicFile.forEach((material)=>{
+        const storage = getStorage();
+        const fileRef = ref(storage, material.file_url);
+        getDownloadURL(fileRef).then((url) => {material.source = url})
+      })
+      console.log(this.allPublicFile)
+    },
+    (err) => {console.log(err)}
+    )
 
     onAuthStateChanged(this.auth, (user) => {
             if(user) {
@@ -457,6 +471,19 @@ export default{
                       
                     </li>      
                   </ul>
+
+                  <h2>All Public File</h2>
+                  <div class="all-file-section">
+                    <div v-for="file in allPublicFile">
+                      <div v-if="file.source != undefined">
+                        <vue-pdf-embed :source=file.source height="200" :disable-text-layer=true :page="1" />
+                      </div>
+                      <b>{{ file.title }}</b><br>
+                      <span><b>level: </b>{{ file.level }}</span><br>
+                      <span><b>Subject: </b>{{ file.subject }}</span>
+                      
+                    </div>
+                  </div>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -592,6 +619,11 @@ body {
   text-decoration-line: underline;
   text-decoration-thickness: 8px;
   text-decoration-color: #ffd200;
+}
+
+.all-file-section{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 </style>
