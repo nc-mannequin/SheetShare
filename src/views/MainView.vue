@@ -217,7 +217,12 @@ export default{
         own_materials_id: arr_id.filter(f => f!=docRefId)
       }
       console.log(dataObj)
-      const updateRef = await updateDoc(docRef, dataObj)
+      await updateDoc(docRef, dataObj)
+      
+      const materialDocRef = doc(db,"material/"+docRefId)
+      await deleteDoc(materialDocRef)
+      
+
     },
     async onNewGroupClick(){
       console.log(this.group_text)
@@ -229,7 +234,8 @@ export default{
           description: "temp_description",
           group_name: this.group_text,
           materials:[],
-          members:[this.user.user_id]
+          members:[this.user.user_id],
+          comments:[]
       }
       const insertRef = await setDoc(groupDocRef, dataObj)
       const userDocRef = doc(db,"user/"+this.userId)
@@ -253,7 +259,15 @@ export default{
       const groupDataObj = {
         members: arr_id.filter(f=>f!=this.user.user_id)
       }
-      await updateDoc(groupDocRef, groupDataObj)
+      if(groupDataObj.members.length == 0){
+        await deleteDoc(groupDocRef)
+      }
+      else
+      {
+        await updateDoc(groupDocRef, groupDataObj)
+      }
+      
+      
 
       const docRef = doc(db,"user/"+this.userId)
       var arr_id = []
