@@ -3,11 +3,13 @@ import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
 import VuePdfEmbed from 'vue-pdf-embed'
+import MyFileComponent from '../components/MyFileComponent.vue';
 
 export default{
   name: 'HomePage',
   components: {
     VuePdfEmbed,
+    MyFileComponent,
   },
   data () {
     return {
@@ -26,7 +28,9 @@ export default{
           level:"",
           subject:"",
           description:""
-        }
+        },
+        file_type_error: false,
+        file_upload_error: false,
     }
   },
   beforeMount () {
@@ -158,8 +162,37 @@ export default{
     onUploadSubmit(event){
       console.log(this.file)
       console.log(event)
-      if(this.upload_file_detail.description == "" || this.upload_file_detail.level == "" || this.upload_file_detail.subject == ""){
-        alert("please fill out the form. u buffoon.")
+
+      const alertPlaceholder = document.getElementById('liveAlertPlaceholder-Upload')
+        const appendAlert = (icon, messageone, messagetwo, messagethree, type) => {
+                const wrapper = document.createElement('div')
+                wrapper.innerHTML = [
+                    `<div class="alert alert-${type}" role="alert">`,
+                    `<span><span class="material-symbols-outlined mx-2">${icon}</span><span class="alert-heading h4"><strong>${messageone}</strong></span></span>`,
+                    `<p class="my-3">${messagetwo}</p>`,
+                    '<hr>',
+                    `<p class="mb-0">${messagethree}</p>`,
+                    '</div>'
+                ].join('')
+                
+                alertPlaceholder.append(wrapper)
+        }
+
+
+      for (let index = 0; index < this.file.length; index++) {
+        const afile = this.file[index];
+        if(afile.type != 'application/pdf' ){
+          console.log(afile.type)
+          this.file_type_error = true
+        }
+      }
+
+      if(this.upload_file_detail.level == "" || this.upload_file_detail.subject == "" || this.file_type_error == true){
+        if (this.file_upload_error == false){
+          appendAlert('error', 'Invalid File Type or Incomplete Required Fields', 'Please try again with a valid file type and complete all required fields.', 'Or click on the cancel button to abort the operation.', 'danger')
+          this.file_upload_error = true
+        }
+        this.file_type_error = false
       }
       else
       {
@@ -323,6 +356,20 @@ export default{
       })
       console.log(url_for_source)
     },
+    cancelUpload(){
+      document.getElementById("file_upload").value = "";
+      this.upload_file_detail = {
+          level:"",
+          subject:"",
+          description:""
+        };
+
+      const list = document.getElementById("liveAlertPlaceholder-Upload");
+      if (list.hasChildNodes()) {
+        list.removeChild(list.firstElementChild);
+        this.file_upload_error = false
+      }
+    },
     
 
       
@@ -364,7 +411,7 @@ export default{
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
                                   <RouterLink to="/home">
-                                    <span class="material-symbols-outlined mx-2 thispage">library_books</span>
+                                    <span class="material-symbols-outlined mx-2 thispage">home</span>
                                     <span class="underline"><strong>Home</strong></span>
                                   </RouterLink>
                                 </li>
@@ -385,7 +432,12 @@ export default{
                     </div>
 
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
-                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">Logout</button>
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">
+                          <div class="row justify-content-center align-items-center g-2">
+                            <div class="col-3 text-end"><span class="material-symbols-outlined">exit_to_app</span></div>
+                            <div class="col-9 text-center"><span>Logout</span></div>
+                          </div>
+                        </button>
                     </div>
 
                     <br>
@@ -395,28 +447,17 @@ export default{
                 </div>
 
                 <div class="col-md-9">
-                  <h1 class="mb-3">Upload file</h1>
-                  <label for="formFileMultiple" class="form-label"><h3>Choose file(s) to upload.</h3></label>
-                  <input class="form-control mb-3" id="file_upload" type="file" multiple @change="onUploadChange">
-                  
-
-                  <label for="levelDataList" class="form-label"><h3>Level</h3></label>
-                  <input class="form-control mb-3" list="leveldatalistOptions" id="levelDataList" placeholder="Type to search..." v-model="upload_file_detail.level">
-                  <datalist id="leveldatalistOptions">
-                    <option v-for="level in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'level').options : []" :value=level></option>
-                  </datalist>
-
-                  <label for="subjectDataList" class="form-label"><h3>Subject</h3></label>
-                  <input class="form-control mb-3" list="subjectdatalistOptions" id="subjectDataList" placeholder="Type to search..." v-model="upload_file_detail.subject">
-                  <datalist id="subjectdatalistOptions">
-                    <option v-for="subject in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'subject').options : []" :value=subject></option>
-                  </datalist>
-
-                  <label for="descriptionTextarea" class="form-label"><h3>Description</h3></label><br>
-                  <textarea class="w-100" id="descriptionTextarea" rows="3" v-model="upload_file_detail.description"></textarea><br>
-
-                  <button class="btn btn-outline-primary" type="button" @click="onUploadSubmit">Submit</button>
-
+                  <div class="row mt-3">
+                    <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">home</span>Home</span></h2>
+                  </div>
+                  <div class="row my-3">
+                    <div class="col">
+                      
+                    </div>
+                    <div class="col text-end">
+                      <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop-uploadfile"><span><span class="material-symbols-outlined me-2">upload</span>Upload Material</span></button>
+                    </div>
+                  </div>
                   <p>own material</p>
                   <ul>
                     <li v-for="material in own_materials">
@@ -432,6 +473,7 @@ export default{
                       
                       <div v-if="material[2] != undefined">
                         <vue-pdf-embed :source=material[2] height="200" :disable-text-layer=true :page="1" />
+                        <MyFileComponent :file=material[2]></MyFileComponent>
                       </div>
                       <!-- {{ getFilenameFromId(fileId) }}
                       <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
@@ -481,6 +523,53 @@ export default{
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger" @click="logout">Logout</button>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <div class="modal fade" id="staticBackdrop-uploadfile" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Upload Material</strong></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="cancelUpload"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row mt-2 px-1" id="liveAlertPlaceholder-Upload"></div>
+                <form class="g-3 needs-validation" novalidate>
+                  <label for="file_upload" class="form-label"><h5 class="mx-3 my-2 text-start"><strong>Attach your learning materials</strong><span class="text-danger">*</span></h5></label>
+                  <div class="input-group px-3">
+                    <input class="form-control mb-1" id="file_upload" type="file" accept=".pdf" multiple @change="onUploadChange" required>
+                  </div>
+                  <h6 class="mx-3 text-end text-danger"><small>you can attach one file or multiple files, but only in '.pdf' extension are allowed.</small></h6>
+
+                  <label for="levelDropdown" class="form-label"><h5 class="mx-3 text-start"><strong>Level</strong><span class="text-danger">*</span></h5></label>
+                  <div class="input-group px-3">
+                    <select class="form-select mb-1" id="levelDropdown" placeholder="Please select ..." v-model="upload_file_detail.level" required>
+                      <option v-for="level in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'level').options : []" :value=level>{{ level }}</option>
+                    </select>
+                  </div>
+
+                  <label for="subjectDropdown" class="form-label"><h5 class="mx-3 text-start"><strong>Subject</strong><span class="text-danger">*</span></h5></label>
+                  <div class="input-group px-3">
+                    <select class="form-select mb-1" id="subjectDropdown" placeholder="Please select ..." v-model="upload_file_detail.subject" required>
+                      <option v-for="subject in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'subject').options : []" :value=subject>{{ subject }}</option>
+                    </select>
+                  </div>
+
+                  <label for="descriptionTextarea" class="form-label"><h5 class="mx-3 mt-1 text-start"><strong>Description</strong></h5></label><br>
+                  <div class="input-group px-3">
+                    <textarea class="w-100" id="descriptionTextarea" rows="3" v-model="upload_file_detail.description"></textarea>
+                  </div>
+                  <br>
+
+
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="cancelUpload">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="onUploadSubmit">Upload</button>
               </div>
             </div>
           </div>

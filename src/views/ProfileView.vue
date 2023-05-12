@@ -224,7 +224,7 @@ export default {
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
                                   <RouterLink to="/home">
-                                    <span class="material-symbols-outlined mx-2">library_books</span>
+                                    <span class="material-symbols-outlined mx-2">home</span>
                                     Home
                                   </RouterLink>
                                 </li>
@@ -245,7 +245,12 @@ export default {
                     </div>
 
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
-                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">Logout</button>
+                      <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">
+                          <div class="row justify-content-center align-items-center g-2">
+                            <div class="col-3 text-end"><span class="material-symbols-outlined">exit_to_app</span></div>
+                            <div class="col-9 text-center"><span>Logout</span></div>
+                          </div>
+                      </button>
                     </div>
 
                     <br>

@@ -82,7 +82,7 @@ export default {
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
                                   <RouterLink to="/home">
-                                    <span class="material-symbols-outlined mx-2">library_books</span>
+                                    <span class="material-symbols-outlined mx-2">home</span>
                                     Home
                                   </RouterLink>
                                 </li>
