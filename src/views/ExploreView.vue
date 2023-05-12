@@ -2,15 +2,20 @@
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth'
 import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp } from 'firebase/firestore'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
+import ExploreComponent from '../components/ExploreComponent.vue';
 
 export default {
     name: 'Profile',
+    components: {
+        ExploreComponent,
+    },
     data() {
         return {
         auth: getAuth(), 
         isLoggedIn: false,
         userId:"",
         user:{},
+        allPublicFile:{},
         }
     },
     beforeMount () {
@@ -29,6 +34,20 @@ export default {
             this.userId = exist_user[0][0]
             this.user = exist_user[0][1]
         },(err)=>{console.log(err)})
+
+        const materialColRef = collection(db,"material")
+        onSnapshot(materialColRef,
+            (snapShot) => {
+                this.allPublicFile = snapShot.docs.map(doc => doc.data())
+                this.allPublicFile.forEach((material) => {
+                    const storage = getStorage();
+                    const fileRef = ref(storage, material.file_url);
+                    getDownloadURL(fileRef).then((url) => { material.source = url })
+                })
+                console.log(this.allPublicFile)
+            },
+            (err) => { console.log(err) }
+        )
     },
     methods: {
     logout () {
@@ -88,14 +107,14 @@ export default {
                                 </li>
                                 <li class="list-group-item">
                                   <RouterLink to="/explore">
-                                    <span class="material-symbols-outlined mx-2">explore</span>
-                                    explore
+                                    <span class="material-symbols-outlined mx-2 thispage">explore</span>
+                                    <span class="underline"><strong>Explore</strong></span>
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
                                   <RouterLink to="/group">
-                                    <span class="material-symbols-outlined mx-2 thispage">group</span>
-                                    <span class="underline"><strong>Group</strong></span>
+                                    <span class="material-symbols-outlined mx-2">group</span>
+                                    Group
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
@@ -124,14 +143,17 @@ export default {
                 </div>
 
                 <div class="col-md-9">
-                    <div class="row" style="height: 100vh;">
-                        <div class="col-md-3 border-end">
-                            ตรงนี้จะเป็นรายชื่อกลุ่มที่ผู้ใช้อยู่
-                        </div>
-                        <div class="col-md-9">
-                            ตรงนี้จะแสดงไฟล์ที่เอามากองรวมกันและคอมเม้นต์นะกั๊บ
-                        </div>
+                    <div class="row mt-3">
+                        <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">explore</span>Explore</span></h2>
                     </div>
+                  <div class="mt-4">
+                    <div class="container mt-4">
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                          <ExploreComponent v-for="file, i in allPublicFile" :file="file" :key="i"></ExploreComponent>
+                        </div>
+                      </div>
+                  </div>
+
                             <footer>
                                 <div class="container py-4 py-lg-5">
                                     <div class="row row-cols-2 row-cols-md-4">

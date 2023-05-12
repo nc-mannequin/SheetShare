@@ -8,6 +8,7 @@ import MainView from '../views/MainView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import EditFileView from '../views/EditFileView.vue'
 import GroupView from '../views/GroupView.vue'
+import ExploreView from '../views/ExploreView.vue'
 
 const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
@@ -62,6 +63,14 @@ const router = createRouter({
       path: '/group',
       name: 'group',
       component: GroupView,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/explore',
+      name: 'explore',
+      component: ExploreView,
       meta: {
         requiresAuth: true
       }

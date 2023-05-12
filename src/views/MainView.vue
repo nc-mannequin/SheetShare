@@ -2,13 +2,11 @@
 import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
-import VuePdfEmbed from 'vue-pdf-embed'
 import MyFileComponent from '../components/MyFileComponent.vue';
 
 export default{
   name: 'HomePage',
   components: {
-    VuePdfEmbed,
     MyFileComponent,
   },
   data () {
@@ -453,6 +451,12 @@ export default{
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
+                                  <RouterLink to="/explore">
+                                    <span class="material-symbols-outlined mx-2">explore</span>
+                                    explore
+                                  </RouterLink>
+                                </li>
+                                <li class="list-group-item">
                                   <RouterLink to="/group">
                                     <span class="material-symbols-outlined mx-2">group</span>
                                     Group
@@ -485,21 +489,32 @@ export default{
 
                 <div class="col-md-9">
                   <div class="row mt-3">
-                    <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">home</span>Home</span></h2>
-                  </div>
-                  <div class="row my-3">
                     <div class="col">
-                      
+                      <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">home</span>Home</span></h2>
                     </div>
                     <div class="col text-end">
                       <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop-uploadfile"><span><span class="material-symbols-outlined me-2">upload</span>Upload Material</span></button>
                     </div>
                   </div>
-                  <p>own material</p>
-                  <div class="container">
-                    <div class="row row-cols-1 row-cols-md-3 g-4">
-                      <MyFileComponent v-for="material in own_materials" :material="material"></MyFileComponent>
+                  <div class="mt-4">
+                    <div class="row mt-3 text-center">
+                      <h4 class="underline"><strong>My Materials</strong></h4>
                     </div>
+                    <div class="container mt-4">
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                          <MyFileComponent v-for="material, i in own_materials" :material="material" :key="i"></MyFileComponent>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="mt-4">
+                    <div class="row mt-3 text-center">
+                      <h4 class="underline"><strong>My Favourited</strong></h4>
+                    </div>
+                    <div class="container mt-4">
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                          เร็ว ๆ นี้เนาะ ใจเย็นดิเตง
+                        </div>
+                      </div>
                   </div>
 
                   <!-- <h2>All Public File</h2>
@@ -514,12 +529,6 @@ export default{
                       
                     </div>
                   </div> -->
-                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
-                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
-                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
-                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
-                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
-                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <footer>
                     <div class="container py-4 py-lg-5 mt-5">
                       <div class="row row-cols-2 row-cols-md-4">

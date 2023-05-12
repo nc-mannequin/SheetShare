@@ -229,6 +229,12 @@ export default {
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
+                                  <RouterLink to="/explore">
+                                    <span class="material-symbols-outlined mx-2">explore</span>
+                                    explore
+                                  </RouterLink>
+                                </li>
+                                <li class="list-group-item">
                                   <RouterLink to="/group">
                                     <span class="material-symbols-outlined mx-2">group</span>
                                     Group
