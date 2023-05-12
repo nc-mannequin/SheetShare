@@ -31,9 +31,10 @@ export default{
         },
         file_type_error: false,
         file_upload_error: false,
+        allPublicFile:{},
     }
   },
-  beforeMount () {
+  async beforeMount () {
     const db = getFirestore()
     const colRef = collection(db,'user')
     onSnapshot(colRef, async snapShot => {
@@ -99,6 +100,28 @@ export default{
     }
     ,(err) => {console.log(err)})
     
+    const materialColRef = collection(db,"material")
+
+    // const allFileQueryCondition = query(collection(db,"material"))
+    // this.allPublicFile = (await getDocs(allFileQueryCondition)).docs.map(doc => doc.data())
+    // this.allPublicFile.forEach((material)=>{
+    //     const storage = getStorage();
+    //     const fileRef = ref(storage, material.file_url);
+    //     getDownloadURL(fileRef).then((url) => {material.source = url})
+    //   })
+
+    onSnapshot(materialColRef,
+    (snapShot) => {
+      this.allPublicFile = snapShot.docs.map(doc => doc.data())
+      this.allPublicFile.forEach((material)=>{
+        const storage = getStorage();
+        const fileRef = ref(storage, material.file_url);
+        getDownloadURL(fileRef).then((url) => {material.source = url})
+      })
+      console.log(this.allPublicFile)
+    },
+    (err) => {console.log(err)}
+    )
 
     onAuthStateChanged(this.auth, (user) => {
             if(user) {
@@ -250,7 +273,12 @@ export default{
         own_materials_id: arr_id.filter(f => f!=docRefId)
       }
       console.log(dataObj)
-      const updateRef = await updateDoc(docRef, dataObj)
+      await updateDoc(docRef, dataObj)
+      
+      const materialDocRef = doc(db,"material/"+docRefId)
+      await deleteDoc(materialDocRef)
+      
+
     },
     async onNewGroupClick(){
       console.log(this.group_text)
@@ -262,7 +290,8 @@ export default{
           description: "temp_description",
           group_name: this.group_text,
           materials:[],
-          members:[this.user.user_id]
+          members:[this.user.user_id],
+          comments:[]
       }
       const insertRef = await setDoc(groupDocRef, dataObj)
       const userDocRef = doc(db,"user/"+this.userId)
@@ -286,7 +315,15 @@ export default{
       const groupDataObj = {
         members: arr_id.filter(f=>f!=this.user.user_id)
       }
-      await updateDoc(groupDocRef, groupDataObj)
+      if(groupDataObj.members.length == 0){
+        await deleteDoc(groupDocRef)
+      }
+      else
+      {
+        await updateDoc(groupDocRef, groupDataObj)
+      }
+      
+      
 
       const docRef = doc(db,"user/"+this.userId)
       var arr_id = []
@@ -485,6 +522,19 @@ export default{
                       
                     </li>      
                   </ul>
+
+                  <h2>All Public File</h2>
+                  <div class="all-file-section">
+                    <div v-for="file in allPublicFile">
+                      <div v-if="file.source != undefined">
+                        <vue-pdf-embed :source=file.source height="200" :disable-text-layer=true :page="1" />
+                      </div>
+                      <b>{{ file.title }}</b><br>
+                      <span><b>level: </b>{{ file.level }}</span><br>
+                      <span><b>Subject: </b>{{ file.subject }}</span>
+                      
+                    </div>
+                  </div>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -667,6 +717,11 @@ body {
   text-decoration-line: underline;
   text-decoration-thickness: 8px;
   text-decoration-color: #ffd200;
+}
+
+.all-file-section{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 </style>
