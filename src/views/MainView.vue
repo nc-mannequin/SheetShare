@@ -496,35 +496,14 @@ export default{
                     </div>
                   </div>
                   <p>own material</p>
-                  <ul>
-                    <li v-for="material in own_materials">
-                      <!-- {{ material }} <br> -->
-                      {{ material[1].title }}
-                      <button class="btn btn-default"  @click="onDownloadFile(material[1].file_url)">DownLoad</button>
-                      <button class="btn btn-default"  @click="onDeleteFile(material[0])">Delete</button>
-                      <RouterLink :to="{path:'/edit_file', name:'edit_file', params: { file_doc_ref :material[0]} }"  >
-                        <button class="btn btn-default">Edit</button>
-                      </RouterLink>
-                      
-                      
-                      
-                      <div v-if="material[2] != undefined">
-                        <vue-pdf-embed :source=material[2] height="200" :disable-text-layer=true :page="1" />
-                        <MyFileComponent :file=material[2]></MyFileComponent>
-                      </div>
-                      <!-- {{ getFilenameFromId(fileId) }}
-                      <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
-                      <button class="btn btn-default"  @click="onDeleteFile(fileId)">Delete</button> -->
-                      <!-- {{ onPreviewFile(getFilePathFromFileId(fileId)) }} -->
-                      <!-- <vue-pdf-embed :source="onPreviewFile(fileId) ? onPreviewFile(fileId):''" :id=fileId /> -->
-                      <!-- <vue-pdf-embed :id=fileId /> -->
-                      <!-- <vue-pdf-embed source="https://firebasestorage.googleapis.com/v0/b/sheetshare-7e0d8.appspot.com/o/OBCdVKibs0Q2kW6VT6OZnyAwsFj2%2F1683355781183ResumeButFromWatek%20(1).pdf?alt=media&token=754b2e1c-bf99-48f8-b387-5faeac282d2b" :id=fileId /> -->
-                      
-                    </li>      
-                  </ul>
+                  <div class="container">
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                      <MyFileComponent v-for="material in own_materials" :material="material"></MyFileComponent>
+                    </div>
+                  </div>
 
-                  <h2>All Public File</h2>
-                  <div class="all-file-section">
+                  <!-- <h2>All Public File</h2>
+                  <div class="file-section">
                     <div v-for="file in allPublicFile">
                       <div v-if="file.source != undefined">
                         <vue-pdf-embed :source=file.source height="200" :disable-text-layer=true :page="1" />
@@ -534,7 +513,7 @@ export default{
                       <span><b>Subject: </b>{{ file.subject }}</span>
                       
                     </div>
-                  </div>
+                  </div> -->
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -719,7 +698,7 @@ body {
   text-decoration-color: #ffd200;
 }
 
-.all-file-section{
+.file-section{
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
