@@ -86,7 +86,7 @@ export default{
         this.own_materials.forEach((material) => {
           const storage = getStorage();
           const fileRef = ref(storage, material[1].file_url);
-          getDownloadURL(fileRef).then((url) => {material[2] = url})
+          getDownloadURL(fileRef).then((url) => {material[2] = url}).catch((err)=>{console.log(err)})
         })
       })
     },(err)=>{console.log(err)})
@@ -114,9 +114,8 @@ export default{
       this.allPublicFile.forEach((material)=>{
         const storage = getStorage();
         const fileRef = ref(storage, material.file_url);
-        getDownloadURL(fileRef).then((url) => {material.source = url})
+        getDownloadURL(fileRef).then((url) => {material.source = url}).catch((err)=>{console.log(err)})
       })
-      console.log(this.allPublicFile)
     },
     (err) => {console.log(err)}
     )
@@ -217,6 +216,8 @@ export default{
       }
       else
       {
+        var arr_id = []
+        arr_id = arr_id.concat(this.user.own_materials_id)
         for (let index = 0; index < this.file.length; index++) {
           const afile = this.file[index];
           if(afile.name!=undefined ){
@@ -225,7 +226,8 @@ export default{
           const storageRef = ref(storage, url);
           uploadBytes(storageRef, afile)
           .then(async (snapshot)=>{
-            console.log(snapshot.metadata)
+            console.log(index,snapshot.metadata)
+            console.log(snapshot)
             const db = getFirestore()
             const materialDocRef = doc(collection(db,"material"))
             const materialDataObj = {
@@ -240,24 +242,33 @@ export default{
               title:snapshot.metadata.fullPath.slice(42),
               user_id:this.user.user_id
             }
+            console.log("detail =>",this.upload_file_detail)
             await setDoc(materialDocRef, materialDataObj).then(()=>{
-              this.upload_file_detail.level = ""
-              this.upload_file_detail.subject = ""
-              this.upload_file_detail.description = ""
+              console.log(index,this.file.length -1)
+              if(index == this.file.length - 1){
+                document.getElementById("file_upload").value = ""
+                this.upload_file_detail.level = ""
+                this.upload_file_detail.subject = ""
+                this.upload_file_detail.description = ""
+              }
             })
+            
             const userDocRef = doc(db,"user/"+this.userId)
-            var arr_id = []
-            arr_id = arr_id.concat(this.user.own_materials_id)
+            arr_id = arr_id.concat(materialDocRef.id)
             const dataObj = {
-              own_materials_id: arr_id.concat(materialDocRef.id)
+              own_materials_id: arr_id
             }
+            console.log(index," ",dataObj.own_materials_id)
             await updateDoc(userDocRef, dataObj)
+            
           })
         }
       }
       }
       
-      document.getElementById("file_upload").value = ""
+      
+      
+            
       
     },
     async onDeleteFile(docRefId){
@@ -502,7 +513,7 @@ export default{
                     </div>
                     <div class="container mt-4">
                         <div class="row row-cols-1 row-cols-md-2 g-4">
-                          <MyFileComponent v-for="material, i in own_materials" :material="material" :key="i"></MyFileComponent>
+                          <MyFileComponent v-for="material, i in own_materials" :material="material" :userId="userId" :user="user" :key="i"></MyFileComponent>
                         </div>
                       </div>
                   </div>
