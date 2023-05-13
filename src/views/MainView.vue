@@ -2,14 +2,19 @@
 import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
+import VuePdfEmbed from 'vue-pdf-embed'
 import MyFileComponent from '../components/MyFileComponent.vue';
+// import Joke from '../components/Joke.vue';
+import axios from 'axios';
 
 export default{
   name: 'HomePage',
   components: {
+    VuePdfEmbed,
     MyFileComponent,
+    // Joke
   },
-  data () {
+  data(){
     return {
         auth: getAuth(), 
         isLoggedIn: false,
@@ -30,8 +35,10 @@ export default{
         file_type_error: false,
         file_upload_error: false,
         allPublicFile:{},
+        joke: ""
     }
   },
+
   async beforeMount () {
     const db = getFirestore()
     const colRef = collection(db,'user')
@@ -73,11 +80,10 @@ export default{
             const group_key = this.user_group[index][0]
             const user_key = id
             this.group_member[[group_key,user_key]] = target_user.docs[0].data().display_name
-            // console.log(this.group_member)
+            console.log(this.group_member)
             // [this.user_group[index][0]][id] = target_user.docs[0].data().display_name
             // this.group_member[this.user_group[index][0]][id] == undefined ? [target_user.docs[0].data().display_name] : this.group_member[this.user_group[index][0]].concat(target_user.docs[0].data().display_name)
           });
-          
         }
       })
       const materialColRef = collection(db,"material")
@@ -86,7 +92,7 @@ export default{
         this.own_materials.forEach((material) => {
           const storage = getStorage();
           const fileRef = ref(storage, material[1].file_url);
-          getDownloadURL(fileRef).then((url) => {material[2] = url}).catch((err)=>{console.log(err)})
+          getDownloadURL(fileRef).then((url) => {material[2] = url})
         })
       })
     },(err)=>{console.log(err)})
@@ -114,8 +120,9 @@ export default{
       this.allPublicFile.forEach((material)=>{
         const storage = getStorage();
         const fileRef = ref(storage, material.file_url);
-        getDownloadURL(fileRef).then((url) => {material.source = url}).catch((err)=>{console.log(err)})
+        getDownloadURL(fileRef).then((url) => {material.source = url})
       })
+      console.log(this.allPublicFile)
     },
     (err) => {console.log(err)}
     )
@@ -143,6 +150,7 @@ export default{
                 alert(error.message)
             })
     },
+
     onDownloadFile(path){
       // Create a reference to the file we want to download
       console.log(path)
@@ -216,8 +224,6 @@ export default{
       }
       else
       {
-        var arr_id = []
-        arr_id = arr_id.concat(this.user.own_materials_id)
         for (let index = 0; index < this.file.length; index++) {
           const afile = this.file[index];
           if(afile.name!=undefined ){
@@ -226,8 +232,7 @@ export default{
           const storageRef = ref(storage, url);
           uploadBytes(storageRef, afile)
           .then(async (snapshot)=>{
-            console.log(index,snapshot.metadata)
-            console.log(snapshot)
+            console.log(snapshot.metadata)
             const db = getFirestore()
             const materialDocRef = doc(collection(db,"material"))
             const materialDataObj = {
@@ -242,35 +247,66 @@ export default{
               title:snapshot.metadata.fullPath.slice(42),
               user_id:this.user.user_id
             }
-            console.log("detail =>",this.upload_file_detail)
             await setDoc(materialDocRef, materialDataObj).then(()=>{
-              console.log(index,this.file.length -1)
-              if(index == this.file.length - 1){
-                document.getElementById("file_upload").value = ""
-                this.upload_file_detail.level = ""
-                this.upload_file_detail.subject = ""
-                this.upload_file_detail.description = ""
-              }
+              this.upload_file_detail.level = ""
+              this.upload_file_detail.subject = ""
+              this.upload_file_detail.description = ""
             })
-            
             const userDocRef = doc(db,"user/"+this.userId)
-            arr_id = arr_id.concat(materialDocRef.id)
+            var arr_id = []
+            arr_id = arr_id.concat(this.user.own_materials_id)
             const dataObj = {
-              own_materials_id: arr_id
+              own_materials_id: arr_id.concat(materialDocRef.id)
             }
-            console.log(index," ",dataObj.own_materials_id)
             await updateDoc(userDocRef, dataObj)
-            
           })
         }
       }
       }
       
-      
-      
-            
+      document.getElementById("file_upload").value = ""
       
     },
+
+
+// ===============================================================================================================
+    async fetchJoke() {
+    const res = await fetch('https://icanhazdadjoke.com/', {
+      headers: { Accept: "application/json" }
+    });
+    console.log(res);
+    if (!res.ok) {
+      throw new Error("Result OK");
+    }
+    const data = await res.json();
+    console.log(data);
+    this.joke = data.joke
+  },
+  async getDadJoKe(){
+      const config = {
+        headers: {
+        Accept: 'application/json'
+      }
+    }
+    try {
+      const res = await axios.get(
+        'https://icanhazdadjoke.com/', 
+        config
+      )
+      const data = await res.json();
+      console.log(data);
+      this.joke = data.joke
+
+      // this.joke = res.data.joke
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err)
+    }
+  },
+// ===============================================================================================================
+
+
+
     async onDeleteFile(docRefId){
       console.log("on delete =>",docRefId)
       const db = getFirestore()
@@ -415,10 +451,7 @@ export default{
         list.removeChild(list.firstElementChild);
         this.file_upload_error = false
       }
-    },
-    
-
-      
+    }
   },
   
 }
@@ -462,12 +495,6 @@ export default{
                                   </RouterLink>
                                 </li>
                                 <li class="list-group-item">
-                                  <RouterLink to="/explore">
-                                    <span class="material-symbols-outlined mx-2">explore</span>
-                                    explore
-                                  </RouterLink>
-                                </li>
-                                <li class="list-group-item">
                                   <RouterLink to="/group">
                                     <span class="material-symbols-outlined mx-2">group</span>
                                     Group
@@ -482,6 +509,14 @@ export default{
                             </ul>
                         </div>
                     </div>
+
+<!-- ================================================================================================= -->
+                    <div>
+                      <button class="btn btn-default"  @click="fetchJoke()">Joke</button>
+                      <br>
+                      <p3 class="mt-2">           {{joke}}</p3>
+                    </div>
+<!-- ================================================================================================= -->
 
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
                         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">
@@ -500,36 +535,46 @@ export default{
 
                 <div class="col-md-9">
                   <div class="row mt-3">
+                    <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">home</span>Home</span></h2>
+                  </div>
+                  <div class="row my-3">
                     <div class="col">
-                      <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">home</span>Home</span></h2>
+                      
                     </div>
                     <div class="col text-end">
                       <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop-uploadfile"><span><span class="material-symbols-outlined me-2">upload</span>Upload Material</span></button>
                     </div>
                   </div>
-                  <div class="mt-4">
-                    <div class="row mt-3 text-center">
-                      <h4 class="underline"><strong>My Materials</strong></h4>
-                    </div>
-                    <div class="container mt-4">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                          <MyFileComponent v-for="material, i in own_materials" :material="material" :key="i"></MyFileComponent>
-                        </div>
+                  <p>own material</p>
+                  <ul>
+                    <li v-for="material in own_materials">
+                      <!-- {{ material }} <br> -->
+                      {{ material[1].title }}
+                      <button class="btn btn-default"  @click="onDownloadFile(material[1].file_url)">DownLoad</button>
+                      <button class="btn btn-default"  @click="onDeleteFile(material[0])">Delete</button>
+                      <RouterLink :to="{path:'/edit_file', name:'edit_file', params: { file_doc_ref :material[0]} }"  >
+                        <button class="btn btn-default">Edit</button>
+                      </RouterLink>
+                      
+                      
+                      
+                      <div v-if="material[2] != undefined">
+                        <vue-pdf-embed :source=material[2] height="200" :disable-text-layer=true :page="1" />
+                        <MyFileComponent :file=material[2]></MyFileComponent>
                       </div>
-                  </div>
-                  <div class="mt-4">
-                    <div class="row mt-3 text-center">
-                      <h4 class="underline"><strong>My Favourited</strong></h4>
-                    </div>
-                    <div class="container mt-4">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                          เร็ว ๆ นี้เนาะ ใจเย็นดิเตง
-                        </div>
-                      </div>
-                  </div>
+                      <!-- {{ getFilenameFromId(fileId) }}
+                      <button class="btn btn-default"  @click="onDownloadFile(getFilePathFromFileId(fileId))">DownLoad</button>
+                      <button class="btn btn-default"  @click="onDeleteFile(fileId)">Delete</button> -->
+                      <!-- {{ onPreviewFile(getFilePathFromFileId(fileId)) }} -->
+                      <!-- <vue-pdf-embed :source="onPreviewFile(fileId) ? onPreviewFile(fileId):''" :id=fileId /> -->
+                      <!-- <vue-pdf-embed :id=fileId /> -->
+                      <!-- <vue-pdf-embed source="https://firebasestorage.googleapis.com/v0/b/sheetshare-7e0d8.appspot.com/o/OBCdVKibs0Q2kW6VT6OZnyAwsFj2%2F1683355781183ResumeButFromWatek%20(1).pdf?alt=media&token=754b2e1c-bf99-48f8-b387-5faeac282d2b" :id=fileId /> -->
+                      
+                    </li>      
+                  </ul>
 
-                  <!-- <h2>All Public File</h2>
-                  <div class="file-section">
+                  <h2>All Public File</h2>
+                  <div class="all-file-section">
                     <div v-for="file in allPublicFile">
                       <div v-if="file.source != undefined">
                         <vue-pdf-embed :source=file.source height="200" :disable-text-layer=true :page="1" />
@@ -539,7 +584,13 @@ export default{
                       <span><b>Subject: </b>{{ file.subject }}</span>
                       
                     </div>
-                  </div> -->
+                  </div>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <br><br><br><br><br><br><br><br><br><br><br><br><br>
                   <footer>
                     <div class="container py-4 py-lg-5 mt-5">
                       <div class="row row-cols-2 row-cols-md-4">
@@ -678,7 +729,6 @@ export default{
       <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
     </section> -->
     <!-- <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button> -->
-    
 </template>
 
 <style scoped>
@@ -719,7 +769,7 @@ body {
   text-decoration-color: #ffd200;
 }
 
-.file-section{
+.all-file-section{
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
