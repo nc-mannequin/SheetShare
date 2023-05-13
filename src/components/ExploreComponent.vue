@@ -1,5 +1,6 @@
 <script>
 import VuePdfEmbed from 'vue-pdf-embed'
+import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 export default {
     name: 'Explore',
@@ -12,6 +13,38 @@ export default {
         }
     },
     methods:{
+        onDownloadFile(path) {
+            // Create a reference to the file we want to download
+            console.log(path)
+            const storage = getStorage();
+            const starsRef = ref(storage, path);
+            getDownloadURL(starsRef)
+                .then((url) => {
+                    console.log(url)
+                    const xhr = new XMLHttpRequest()
+                    xhr.responseType = 'blob';
+                    xhr.onload = (event) => {
+                        const blob = xhr.response;
+                    };
+                    xhr.onloadend = (event) => {
+                        console.log(path)
+                        console.log(event)
+                        console.log(xhr)
+                        const url = window.URL.createObjectURL(xhr.response);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', path.slice(42));
+                        document.body.appendChild(link);
+                        link.click();
+                    }
+
+                    xhr.open('GET', url);
+                    xhr.send();
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        },
 
     },
 }
@@ -36,6 +69,7 @@ export default {
                         <li class="list-group-item"><small><span><b>level: </b>{{ file[1].level }}</span></small></li>
                         <li class="list-group-item"><small><span><b>Subject: </b>{{ file[1].subject }}</span></small></li>
                     </ul>
+                    <button class="btn btn-warning" @click="onDownloadFile(file.file_url)">Download</button>
                   </div>
                 </div>
             </div>
