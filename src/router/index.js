@@ -9,6 +9,7 @@ import ProfileView from '../views/ProfileView.vue'
 import EditFileView from '../views/EditFileView.vue'
 import GroupView from '../views/GroupView.vue'
 import ExploreView from '../views/ExploreView.vue'
+import MaterialView from '../views/MaterialView.vue'
 
 const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
@@ -71,6 +72,14 @@ const router = createRouter({
       path: '/explore',
       name: 'explore',
       component: ExploreView,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/material/:file_doc_ref',
+      name: 'material',
+      component: MaterialView,
       meta: {
         requiresAuth: true
       }

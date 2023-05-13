@@ -1,8 +1,6 @@
 <script>
 import VuePdfEmbed from 'vue-pdf-embed'
-import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
-import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
-import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 export default {
     name: 'MyFile',
@@ -52,6 +50,7 @@ export default {
 </script>
 
 <template>
+    <RouterLink :to="{ path: '/material', name: 'material', params: { file_doc_ref: material[0] } }"  >
     <div class="col">
         <div class="card mb-3 h-100 border border-warning">
             <div class="row">
@@ -71,7 +70,7 @@ export default {
                     </ul>
                     <div class="row text-center mt-3 pt-3">
                         <RouterLink :to="{ path: '/edit_file', name: 'edit_file', params: { file_doc_ref: material[0] } }"  >
-                            <button class="btn btn-warning">Edit</button>
+                            <button class="btn btn-warning"><span class="material-symbols-outlined me-3 thispage">edit</span>Edit</button>
                         </RouterLink>
                     </div>
                   </div>
@@ -79,5 +78,5 @@ export default {
             </div>
         </div>
     </div>
-
+    </RouterLink>
 </template>

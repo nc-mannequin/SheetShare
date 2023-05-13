@@ -5,7 +5,7 @@ import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc,
 import VuePdfEmbed from 'vue-pdf-embed'
 
 export default {
-    name: 'EditFile',
+    name: 'Material',
     components: {
         VuePdfEmbed,
     },
@@ -15,11 +15,13 @@ export default {
         isLoggedIn: false,
         userId:"",
         user:{},
-        display_name_text:"",
         file:{},
-        master_data:{},
         page: 1,
         pageCount: 1,
+        owner:{
+            display_name: "",
+            photo_url: ""
+        }
         }
     },
     beforeMount () {
@@ -50,15 +52,13 @@ export default {
                 })
             })
 
+            const owner_user = snapShot.docs.map(doc => [doc.id,doc.data()] ).filter(f => f[1].user_id == this.file.user_id)
+            this.owner.display_name = owner_user[0][1].display_name
+            this.owner.photo_url = owner_user[0][1].photo_url
+            console.log(this.owner)
+
 
         },(err)=>{console.log(err)})
-
-        const MasterDataColRef = collection(db,"master_data")
-        onSnapshot(MasterDataColRef
-        ,(snapShot) => {
-        this.master_data = snapShot.docs.map(doc => doc.data())
-        }
-        ,(err) => {console.log(err)})
     },
     methods: {
     logout () {
@@ -75,34 +75,8 @@ export default {
     onReloadClick(){
         window.location.reload()
     },
-    async onSaveClick(){
-        const db = getFirestore()
-        const docRef = doc(db,"material/"+this.$route.params.file_doc_ref)
-        await updateDoc(docRef,this.file)
-        window.location.reload()
-    },
     loadedDocument() {
       this.pageCount = this.$refs.pdfRef.pageCount
-    },
-    async onDeleteFile(){
-      const docRefId = this.$route.params.file_doc_ref
-      console.log("on delete =>",docRefId)
-      const db = getFirestore()
-      const docRef = doc(db,"user/"+this.userId)
-      var arr_id = []
-      arr_id = arr_id.concat(this.user.own_materials_id)
-      console.log(arr_id)
-      const dataObj = {
-        own_materials_id: arr_id.filter(f => f!=docRefId)
-      }
-      console.log(dataObj)
-      const updateRef = await updateDoc(docRef, dataObj)
-      await updateDoc(docRef, dataObj)
-      
-      const materialDocRef = doc(db,"material/"+docRefId)
-      await deleteDoc(materialDocRef)
-      this.$router.replace('/home')
-      window.location.reload();
     },
     
     
@@ -187,7 +161,7 @@ export default {
 
                 <div class="col-md-9">
                     <div class="row mt-3">
-                        <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">edit</span>Edit Material</span></h2>
+                        <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">description</span>Material</span></h2>
                     </div>
                     <div class="row mt-3">
                         <div class="btn-group" role="group">
@@ -218,49 +192,65 @@ export default {
                               </div>
                             </div>
                           </div>
+
+                          <div class="row mt-2">
+                            <div class="btn-group" role="group">
+                                <a :href=file.source target="_blank" rel="noopener noreferrer"><button type="button" class="btn btn-dark"><span class="material-symbols-outlined me-2 thispage">open_in_new</span>Preview in New Tab</button></a>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop-delete"><span class="material-symbols-outlined mx-2 thispage">download</span>Download</button>
+                            </div>
+                        </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="card border-0 my-3">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                          <div v-if="owner?.photo_url != ''">
+                                            <img :src=owner.photo_url alt="user_img" class="close-image">
+                                          </div>
+                                          <div v-else>
+                                            <button class="btn btn-primary shadow btn-circle btn-xl btn-disabled"><h3 class="mt-2">{{ owner?.display_name ? owner.display_name.charAt(0) : "" }}</h3></button>
+                                          </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 d-flex align-items-center justify-content-center">
+                                          <div class="card-body">
+                                            <div class="text-center">
+                                                <h4><strong>{{ owner.display_name }}</strong></h4>
+                                                <h6><em>Owner</em></h6>
+                                            </div>
+                                          </div>
+                                    </div>
+                                </div>
+                            </div>
                           <form class="mx-3">
                                 <div class="row g-1 mt-2">
                                     <label for="validationDefault01" class="form-label"><strong>Title</strong></label>
                                     <input type="text" class="form-control" id="validationDefault01" name="title" v-model="file.title" disabled readonly>
                                 </div>
                                 <div class="row g-1 mt-4">
-                                  <label for="levelDropdown" class="form-label"><strong>Level<span class="text-danger">*</span></strong></label>
-                                  <div class="input-group">
-                                    <select class="form-select" id="levelDropdown" :placeholder=file.level v-model="file.level">
-                                      <option v-for="level in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'level').options : []" :value=level>{{ level }}</option>
-                                    </select>
-                                  </div>
+                                  <label for="levelDropdown" class="form-label"><strong>Level</strong></label>
+                                  <input type="text" class="form-control" id="levelDropdown" name="level" v-model="file.level" disabled readonly>
                                 </div>
                                 <div class="row g-1 mt-4">
-                                  <label for="subjectDropdown" class="form-label"><strong>Subject<span class="text-danger">*</span></strong></label>
-                                  <div class="input-group">
-                                    <select class="form-select mb-1" id="subjectDropdown" :placeholder=file.subject v-model="file.subject">
-                                      <option v-for="subject in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'subject').options : []" :value=subject>{{ subject }}</option>
-                                    </select>
-                                  </div>
+                                  <label for="subjectDropdown" class="form-label"><strong>Subject</strong></label>
+                                  <input type="text" class="form-control" id="subjectDropdown" name="subject" v-model="file.subject" disabled readonly>
                                 </div>
                                 <div class="row g-1 mt-4">
                                   <label for="descriptionTextarea" class="form-label"><strong>Description</strong></label>
                                   <div class="input-group">
-                                    <textarea class="w-100" id="descriptionTextarea" rows="3" :placeholder=file.description v-model="file.description"></textarea>
+                                    <textarea class="w-100" id="descriptionTextarea" rows="3" placeholder="No Description" v-model="file.description" disabled readonly></textarea>
                                   </div>
                                 </div>
                           </form>
-                          <div class="row">
-                                <div class="text-center mt-4">
-                                  <button type="button" class="btn btn-danger btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop-cancel">Cancel</button>
-                                  <button type="button" class="btn btn-primary shadow btn-sm" @click="onSaveClick">Save</button>
-                                </div>
-                          </div>
-                          <div class="row">
-                            <div class="text-center mt-4 d-grid gap-2">
-                              <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-delete">Delete</button>
-                            </div>
+
+                          <div class="row justify-content-center align-items-center g-2 mt-5 text-center">
+                            <p>กดหัวใจและติดดาวตรงนี้</p>
+                            <p>แสดงจำนวนคะแนนคนที่กดหัวใจตรงนี้</p>
                           </div>
                         </div>
                       </div>
+                      <p class="text-center">แสดงคอมเม้นต์และคอมเม้นต์ไฟล์ตรงนี้</p>
                       <footer>
                                 <div class="container py-4 py-lg-5 mt-5">
                                     <div class="row row-cols-2 row-cols-md-4">
@@ -330,7 +320,7 @@ export default {
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" @click="onDeleteFile">DELETE</button>
+                <button type="button" class="btn btn-danger" @click="onReloadClick">DELETE</button>
               </div>
             </div>
           </div>

@@ -38,11 +38,12 @@ export default {
         const materialColRef = collection(db,"material")
         onSnapshot(materialColRef,
             (snapShot) => {
-                this.allPublicFile = snapShot.docs.map(doc => doc.data())
+                this.allPublicFile = snapShot.docs.map(doc => [doc.id, doc.data()])
                 this.allPublicFile.forEach((material) => {
+                    console.log(material)
                     const storage = getStorage();
-                    const fileRef = ref(storage, material.file_url);
-                    getDownloadURL(fileRef).then((url) => { material.source = url })
+                    const fileRef = ref(storage, material[1].file_url);
+                    getDownloadURL(fileRef).then((url) => { material[1].source = url })
                 })
                 console.log(this.allPublicFile)
             },
