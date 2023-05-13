@@ -150,6 +150,31 @@ export default{
                 alert(error.message)
             })
     },
+    
+// =============================================================================
+    getDadJoKe(){
+      const config = {
+        headers: {
+        Accept: 'application/json'
+      }
+    }
+    .then(()=>{
+      const res = this.axios.get(
+        'https://icanhazdadjoke.com/', 
+        config
+      )
+      const data = res.json();
+      console.log(data);
+      this.joke = data.joke
+
+      // this.joke = res.data.joke
+    })
+    .catch((err)=>{
+      // eslint-disable-next-line no-console
+      console.log(err)
+    })
+  },
+// =============================================================================
 
     onDownloadFile(path){
       // Create a reference to the file we want to download
@@ -281,27 +306,6 @@ export default{
     const data = await res.json();
     console.log(data);
     this.joke = data.joke
-  },
-  async getDadJoKe(){
-      const config = {
-        headers: {
-        Accept: 'application/json'
-      }
-    }
-    try {
-      const res = await axios.get(
-        'https://icanhazdadjoke.com/', 
-        config
-      )
-      const data = await res.json();
-      console.log(data);
-      this.joke = data.joke
-
-      // this.joke = res.data.joke
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log(err)
-    }
   },
 // ===============================================================================================================
 
@@ -514,7 +518,7 @@ export default{
                     <div>
                       <button class="btn btn-default"  @click="fetchJoke()">Joke</button>
                       <br>
-                      <p3 class="mt-2">           {{joke}}</p3>
+                      <p3 class="mt-2">{{joke}}</p3>
                     </div>
 <!-- ================================================================================================= -->
 
