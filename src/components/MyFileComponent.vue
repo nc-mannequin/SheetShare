@@ -20,7 +20,7 @@ export default {
 <template>
     <RouterLink :to="{ path: '/material', name: 'material', params: { file_doc_ref: material[0] } }"  >
     <div class="col">
-        <div class="card mb-3 border border-warning">
+        <div class="card mb-3 h-100 border border-warning">
             <div class="row">
                 <div class="col-md-6">
                     <div v-if="material[2] != undefined">
@@ -29,8 +29,8 @@ export default {
                 </div>
                 <div class="col-md-6">
                   <div class="card-body">
-                    <div class="row my-4 text-center">
-                        <h5 class="card-title"><strong>{{ material[1].title }}</strong></h5>
+                    <div class="row my-4 text-start ms-1">
+                        <h6 class="card-title"><strong>{{ material[1].title }}</strong></h6>
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><small><span><b>level: </b>{{ material[1].level }}</span></small></li>

@@ -30,8 +30,8 @@ export default {
                 </div>
                 <div class="col-md-6">
                   <div class="card-body">
-                    <div class="row my-4 text-center">
-                        <h5 class="card-title"><strong>{{ file[1].title }}</strong></h5>
+                    <div class="row my-4 text-start ms-1">
+                        <h6 class="card-title"><strong>{{ file[1].title }}</strong></h6>
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><small><span><b>level: </b>{{ file[1].level }}</span></small></li>
