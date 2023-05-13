@@ -6,7 +6,7 @@ import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc,
 
 export default {
     name: 'MyFile',
-    props: ['material'],
+    props: ['material','userId','user'],
     components: {
         VuePdfEmbed,
     },
@@ -47,6 +47,24 @@ export default {
                     console.log(error)
                 })
         },
+        async onDeleteFile(docRefId){
+            console.log("on delete =>",docRefId)
+            const db = getFirestore()
+            const docRef = doc(db,"user/"+this.userId)
+            var arr_id = []
+            arr_id = arr_id.concat(this.user.own_materials_id)
+            console.log(arr_id)
+            const dataObj = {
+                own_materials_id: arr_id.filter(f => f!=docRefId)
+            }
+            console.log(dataObj)
+            await updateDoc(docRef, dataObj)
+            
+            const materialDocRef = doc(db,"material/"+docRefId)
+            await deleteDoc(materialDocRef)
+            
+
+            },
     },
 }
 </script>
@@ -72,7 +90,9 @@ export default {
                     <div class="row text-center mt-3 pt-3">
                         <RouterLink :to="{ path: '/edit_file', name: 'edit_file', params: { file_doc_ref: material[0] } }"  >
                             <button class="btn btn-warning">Edit</button>
-                        </RouterLink>
+                        </RouterLink>&nbsp;
+                        <button class="btn btn-warning" @click="onDownloadFile(material[1].file_url)">Download</button>
+                        <button class="btn btn-warning" @click="onDeleteFile(material[0])">Delete</button>
                     </div>
                   </div>
                 </div>
