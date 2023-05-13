@@ -513,7 +513,7 @@ export default{
                     </div>
                     <div class="container mt-4">
                         <div class="row row-cols-1 row-cols-md-2 g-4">
-                          <MyFileComponent v-for="material, i in own_materials" :material="material" :userId="userId" :user="user" :key="i"></MyFileComponent>
+                          <MyFileComponent v-for="material, i in own_materials" :material="material" :key="i"></MyFileComponent>
                         </div>
                       </div>
                   </div>
