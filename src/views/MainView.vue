@@ -73,7 +73,7 @@ export default{
             const group_key = this.user_group[index][0]
             const user_key = id
             this.group_member[[group_key,user_key]] = target_user.docs[0].data().display_name
-            console.log(this.group_member)
+            // console.log(this.group_member)
             // [this.user_group[index][0]][id] = target_user.docs[0].data().display_name
             // this.group_member[this.user_group[index][0]][id] == undefined ? [target_user.docs[0].data().display_name] : this.group_member[this.user_group[index][0]].concat(target_user.docs[0].data().display_name)
           });
@@ -678,6 +678,7 @@ export default{
       <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button>
     </section> -->
     <!-- <input id="file_upload" type="file" multiple @change="onUploadChange">&nbsp;<button class="btn btn-default" @click="onUploadSubmit">Submit</button> -->
+    
 </template>
 
 <style scoped>

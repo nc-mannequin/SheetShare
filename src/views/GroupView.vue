@@ -1,19 +1,65 @@
 <script>
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth'
-import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp } from 'firebase/firestore'
+import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp, setDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
+import VueMultiselect  from 'vue-multiselect'
+
 
 export default {
     name: 'Profile',
+    components: {
+      VueMultiselect 
+    },
     data() {
         return {
         auth: getAuth(), 
         isLoggedIn: false,
         userId:"",
         user:{},
+        user_group:[],
+        group_text:"",
+        group_member:{},
+        member_text:"",
+        selected_group:{},
+        user_opt:[],
+        selected_user:[]
         }
     },
     beforeMount () {
+        const db = getFirestore()
+        const colRef = collection(db,'user')
+        onSnapshot(colRef, async snapShot => {
+            const current_user = this.auth.currentUser
+            this.user_opt = snapShot.docs.map(doc => doc.data())
+            console.log(this.user_opt)
+            const exist_user = snapShot.docs.map(doc => [doc.id,doc.data()] ).filter(f => f[1].user_id == current_user.uid)
+            this.userId = exist_user[0][0]
+            this.user = exist_user[0][1]
+            const groupColRef = collection(db,"group")
+            onSnapshot(groupColRef, (snapShot) => 
+            {
+              this.user_group = snapShot.docs.map(doc => [doc.id,doc.data()]).filter(f => this.user.group_id.includes(f[0]))
+              for (let index = 0; index < this.user_group.length; index++) {
+                const target_group_members_id = this.user_group[index][1].members
+                target_group_members_id.forEach(async id => {
+                  const queryCondition = query(collection(db,"user"), where("user_id","==",id))
+                  const target_user = await getDocs(queryCondition)
+                  try{
+                    const group_key = this.user_group[index][0]
+                    const user_key = id
+                    this.group_member[[group_key,user_key]] = target_user.docs[0].data().display_name
+                  }
+                  catch(e){
+
+                  }
+                  
+                  // [this.user_group[index][0]][id] = target_user.docs[0].data().display_name
+                  // this.group_member[this.user_group[index][0]][id] == undefined ? [target_user.docs[0].data().display_name] : this.group_member[this.user_group[index][0]].concat(target_user.docs[0].data().display_name)
+                });
+              }
+            })
+        },(err)=>{console.log(err)})
+
         onAuthStateChanged(this.auth, (user) => {
             if(user) {
                 this.isLoggedIn= true
@@ -21,14 +67,8 @@ export default {
                 this.isLoggedIn= false
             }
         })
-        const db = getFirestore()
-        const colRef = collection(db,'user')
-        onSnapshot(colRef, async snapShot => {
-            const current_user = this.auth.currentUser
-            const exist_user = snapShot.docs.map(doc => [doc.id,doc.data()] ).filter(f => f[1].user_id == current_user.uid)
-            this.userId = exist_user[0][0]
-            this.user = exist_user[0][1]
-        },(err)=>{console.log(err)})
+        
+        
     },
     methods: {
     logout () {
@@ -45,6 +85,100 @@ export default {
     refreshpage () {
         window.location.reload();
     },
+    async onNewGroupClick(){
+      console.log(this.group_text)
+      const db = getFirestore()
+      const groupDocRef = doc(collection(db,"group"))
+      const dataObj = {
+          created_at: Timestamp.now(),
+          created_by: this.user.display_name,
+          description: "temp_description",
+          group_name: this.group_text,
+          materials:[],
+          members:[this.user.user_id],
+          comments:[]
+      }
+      const insertRef = await setDoc(groupDocRef, dataObj)
+      const userDocRef = doc(db,"user/"+this.userId)
+      var arr_id = []
+      arr_id = arr_id.concat(this.user.group_id)
+      const userDataObj = {
+        group_id: arr_id.concat(groupDocRef.id)
+      }
+      const updateRef = await updateDoc(userDocRef, userDataObj)
+
+    },
+    async onLeaveGroupClick(group_id){
+      const db = getFirestore()
+
+      const groupDocRef = doc(db,"group/"+group_id)
+      var arr_id = []
+      arr_id = arr_id.concat(this.user_group.filter(f => f[0] == group_id)[0][1].members)
+      console.log(arr_id)
+      console.log(arr_id[0])
+      console.log(arr_id[0][1])
+      const groupDataObj = {
+        members: arr_id.filter(f=>f!=this.user.user_id)
+      }
+      if(groupDataObj.members.length == 0){
+        await deleteDoc(groupDocRef)
+      }
+      else
+      {
+        await updateDoc(groupDocRef, groupDataObj)
+      }
+      this.selected_group = {}
+      
+
+      const docRef = doc(db,"user/"+this.userId)
+      var arr_id = []
+      arr_id = arr_id.concat(this.user.group_id)
+      const dataObj = {
+        group_id: arr_id.filter(f => f!=group_id)
+      }
+      await updateDoc(docRef, dataObj)
+
+      
+    },
+    async onAddMemberClick(group_key){
+      const db = getFirestore()
+      console.log(this.selected_user)
+      const queryCondition = query(collection(db,"user"), where("user_id","in",this.selected_user.map(user => user.user_id)))
+      const target_users = await getDocs(queryCondition)
+      if(target_users.empty){
+        alert("user not found.")
+      }
+      else
+      {
+        const groupDocRef = doc(db,"group/"+group_key)
+        var arr_member_id = []
+        console.log(this.user_group.find(f => f[0] == group_key))
+        arr_member_id = arr_member_id.concat(this.user_group.find(f => f[0] == group_key)[1].members)
+
+        target_users.forEach(async user => {
+          arr_member_id = arr_member_id.concat(user.data().user_id)
+        });
+        const dataObj = {
+          members:arr_member_id
+        }
+        await updateDoc(groupDocRef, dataObj)
+        
+        target_users.forEach(async user => {
+          const userDocRef = doc(db,"user/"+user.id)
+          var arr_group_id = []
+          arr_group_id = arr_group_id.concat(user.get("group_id"))
+          const userDataObj = {
+            group_id: arr_group_id.concat(groupDocRef.id)
+          }
+          await updateDoc(userDocRef, userDataObj)
+        })
+      }
+      this.selected_user = []
+      window.location.reload()
+    },
+    onGroupSelect(group){
+      this.selected_group = group
+    }
     }
 }
 </script>
@@ -124,12 +258,55 @@ export default {
                 </div>
 
                 <div class="col-md-9">
+                  <section>
+                    <h1>My Group</h1>
+                    <input type="text" v-model="group_text">
+                    <button class="btn btn-default" @click="onNewGroupClick()">New Group</button>
+                    
+                
+                  </section>
                     <div class="row" style="height: 100vh;">
-                        <div class="col-md-3 border-end">
-                            ตรงนี้จะเป็นรายชื่อกลุ่มที่ผู้ใช้อยู่
+                        <div class="col-md-3 border-end" style="height: 100vh; overflow-y: scroll;">
+                            ตรงนี้จะเป็นรายชื่อกลุ่มที่ผู้ใช้อยู่<br>
+                            <div class="list-group">
+                              <button v-for="(group, group_index) in user_group" @click="onGroupSelect(group)" class="list-group-item list-group-item-action list-group-item-light">{{ group[1].group_name }}</button>
+                            </div>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-9" style="height: 100vh; overflow-y: scroll;" v-if="selected_group[1] != undefined">
                             ตรงนี้จะแสดงไฟล์ที่เอามากองรวมกันและคอมเม้นต์นะกั๊บ
+                            <h1>{{ selected_group[1].group_name }}</h1>
+                            <h3>{{ selected_group[1].description }}</h3>
+                            <h3>Members</h3>
+                            <ul>
+                              <li v-for="(member, member_index) in selected_group[1].members">
+                                {{ group_member[[selected_group[0], member]] }}
+                              </li>
+                            </ul>
+                            <h3>Materials</h3>
+                            <ul>
+                              <li v-for="(material, member_index) in selected_group[1].materials">
+                                {{ material }}
+                              </li>
+                            </ul>
+
+                            <VueMultiselect
+                            v-model="selected_user"
+                            :options="user_opt.filter(opt => !selected_group[1].members.includes(opt.user_id))"
+                            :multiple="true"
+                            :close-on-select="false"
+                            :clear-on-select="false"
+                            :preserve-search="true"
+                            placeholder="Select User"
+                            label="display_name"
+                            track-by="identifier_email"
+                            >
+                            <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }} options selected</span></template>
+                          </VueMultiselect>
+                            
+
+                          
+                            <button class="btn btn-default" @click="onAddMemberClick(selected_group[0])">Add Member</button>
+                            <button class="btn btn-default" @click="onLeaveGroupClick(selected_group[0])">Leave Group</button>
                         </div>
                     </div>
                             <footer>
