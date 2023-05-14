@@ -472,7 +472,7 @@ export default{
         <div class="container-fluid">
           <div class="row">
                 <div class="col-md-3 border-end">
-                  <div style="position: sticky; top: 80px;">
+                  <div style="position: sticky; top: 10%;">
                     <div class="card border-0">
                         <div class="card-body">
                         <div class="text-center">
@@ -519,10 +519,14 @@ export default{
                             </ul>
                         </div>
                     </div>
-                    <div>
-                      <button class="btn btn-default"  @click="fetchJoke()">Joke</button>
-                      <br>
-                      <p class="mt-2">{{joke}}</p>
+                    <div class="row mx-4 mt-2">
+                      <h6><strong><span style="text-decoration-line: underline; text-decoration-thickness: 5px; text-decoration-color: #ffd200;">Short Joke for YOU!</span></strong></h6>
+                      <p><em>&nbsp; {{ joke }}</em></p>
+                    </div>
+                    <div class="row mx-4">
+                      <button type="button" class="btn btn-primary btn-sm" style="--bs-btn-font-size: 0.75rem;" @click="fetchJoke()">
+                            <div class="text-center justify-content-center align-items-center"><span class="material-symbols-outlined me-2" style="font-size: 1.15rem;">shuffle</span><span>New Joke</span></div>
+                      </button>
                     </div>
 
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
@@ -586,7 +590,7 @@ export default{
                     <div class="container py-4 py-lg-5 mt-5">
                       <div class="row row-cols-2 row-cols-md-4">
                         <div class="col-12 col-md-5">
-                          <div class="fw-bold d-flex align-items-center mb-2"><span style="font-size: 30px;">SheetShare</span></div>
+                          <div class="fw-bold d-flex align-items-center mb-2"><span style="font-size: 200%;">SheetShare</span></div>
                           <p class="text-muted">Collaborative platform and extensive library of educational resources.</p>
                         </div>
                       </div>

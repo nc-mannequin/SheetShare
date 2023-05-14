@@ -3,6 +3,7 @@ import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
 import VuePdfEmbed from 'vue-pdf-embed'
+import axios from 'axios';
 
 export default {
     name: 'Material',
@@ -22,6 +23,7 @@ export default {
             display_name: "",
             photo_url: ""
         },
+        joke: "",
         comment_input:""
         }
     },
@@ -60,6 +62,20 @@ export default {
 
 
         },(err)=>{console.log(err)})
+
+        // ======================================= getDadJoKe ======================================
+
+    axios.get('https://icanhazdadjoke.com/', { headers: { "Accept": "text/plain" } })
+        .then((res) => {
+          console.log(res)
+          this.joke = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
+// =============================================================================
+
     },
     methods: {
     logout () {
@@ -79,7 +95,21 @@ export default {
     loadedDocument() {
       this.pageCount = this.$refs.pdfRef.pageCount
     },
-    async onLikeClick(){
+     // ===============================================================================================================
+
+     async fetchJoke() {
+      axios.get('https://icanhazdadjoke.com/', { headers: { "Accept": "text/plain" } })
+        .then((res) => {
+          console.log(res)
+          this.joke = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+  },
+  
+  // ===============================================================================================================
+  async onLikeClick(){
       const db = getFirestore()
       const currentUserDocRef = doc(db,"user/"+this.userId)
       if(!this.file.likes.map(user => user.id).includes(this.userId)){
@@ -132,7 +162,6 @@ export default {
       await updateDoc(materialDocRef,changeDetail)
       this.comment_input= ""
     }
-    
     
     
     }
@@ -196,6 +225,16 @@ export default {
                                 </li>
                             </ul>
                         </div>
+                    </div>
+
+                    <div class="row mx-4 mt-2">
+                      <h6><strong><span style="text-decoration-line: underline; text-decoration-thickness: 5px; text-decoration-color: #ffd200;">Short Joke for YOU!</span></strong></h6>
+                      <p><em>&nbsp; {{ joke }}</em></p>
+                    </div>
+                    <div class="row mx-4">
+                      <button type="button" class="btn btn-primary btn-sm" style="--bs-btn-font-size: 0.75rem;" @click="fetchJoke()">
+                            <div class="text-center justify-content-center align-items-center"><span class="material-symbols-outlined me-2" style="font-size: 1.15rem;">shuffle</span><span>New Joke</span></div>
+                      </button>
                     </div>
 
                     <div class="d-grid gap-2 text-center mt-5 mx-4">

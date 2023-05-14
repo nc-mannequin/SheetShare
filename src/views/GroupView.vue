@@ -3,6 +3,7 @@ import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth'
 import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp, setDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import VueMultiselect  from 'vue-multiselect'
+import axios from 'axios';
 
 
 export default {
@@ -22,7 +23,8 @@ export default {
         member_text:"",
         selected_group:{},
         user_opt:[],
-        selected_user:[]
+        selected_user:[],
+        joke: "",
         }
     },
     beforeMount () {
@@ -67,6 +69,19 @@ export default {
                 this.isLoggedIn= false
             }
         })
+
+        // ======================================= getDadJoKe ======================================
+
+    axios.get('https://icanhazdadjoke.com/', { headers: { "Accept": "text/plain" } })
+        .then((res) => {
+          console.log(res)
+          this.joke = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
+// =============================================================================
         
         
     },
@@ -178,7 +193,21 @@ export default {
     },
     onGroupSelect(group){
       this.selected_group = group
-    }
+    },
+    // ===============================================================================================================
+
+    async fetchJoke() {
+      axios.get('https://icanhazdadjoke.com/', { headers: { "Accept": "text/plain" } })
+        .then((res) => {
+          console.log(res)
+          this.joke = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+  },
+  
+  // ===============================================================================================================
     }
 }
 </script>
@@ -240,6 +269,16 @@ export default {
                                 </li>
                             </ul>
                         </div>
+                    </div>
+
+                    <div class="row mx-4 mt-2">
+                      <h6><strong><span style="text-decoration-line: underline; text-decoration-thickness: 5px; text-decoration-color: #ffd200;">Short Joke for YOU!</span></strong></h6>
+                      <p><em>&nbsp; {{ joke }}</em></p>
+                    </div>
+                    <div class="row mx-4">
+                      <button type="button" class="btn btn-primary btn-sm" style="--bs-btn-font-size: 0.75rem;" @click="fetchJoke()">
+                            <div class="text-center justify-content-center align-items-center"><span class="material-symbols-outlined me-2" style="font-size: 1.15rem;">shuffle</span><span>New Joke</span></div>
+                      </button>
                     </div>
 
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
