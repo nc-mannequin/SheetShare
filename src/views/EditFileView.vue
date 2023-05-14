@@ -262,7 +262,7 @@ export default {
                           <div class="row mt-2">
                             <div class="btn-group" role="group">
                                 <a :href=file.source target="_blank" rel="noopener noreferrer"><button type="button" class="btn btn-dark"><span class="material-symbols-outlined me-2 thispage">open_in_new</span>Preview in New Tab</button></a>
-                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop-delete"><span class="material-symbols-outlined mx-2 thispage">download</span>Download</button>
+                                <button type="button" class="btn btn-success"><span class="material-symbols-outlined mx-2 thispage">download</span>Download</button>
                             </div>
                         </div>
                         </div>
