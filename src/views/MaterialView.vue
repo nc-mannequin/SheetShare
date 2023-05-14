@@ -21,7 +21,8 @@ export default {
         owner:{
             display_name: "",
             photo_url: ""
-        }
+        },
+        comment_input:""
         }
     },
     beforeMount () {
@@ -78,6 +79,59 @@ export default {
     loadedDocument() {
       this.pageCount = this.$refs.pdfRef.pageCount
     },
+    async onLikeClick(){
+      const db = getFirestore()
+      const currentUserDocRef = doc(db,"user/"+this.userId)
+      if(!this.file.likes.map(user => user.id).includes(this.userId)){
+        const materialDocRef = doc(db,"material/"+this.$route.params.file_doc_ref)
+        var currentLike = this.file.likes
+        const changeDetail = {
+          likes: currentLike.concat(currentUserDocRef)
+        }
+        await updateDoc(materialDocRef,changeDetail)
+        window.location.reload()
+      }
+      else
+      {
+        alert("You already like this shit.")
+      }
+    },
+    async onFavClick(){
+      const db = getFirestore()
+      const currentUserDocRef = doc(db,"user/"+this.userId)
+      var current_fav_materials_id = this.user.fav_materials_id
+      if(!current_fav_materials_id.includes(this.$route.params.file_doc_ref)){
+        const changeDetail = {
+          fav_materials_id:current_fav_materials_id.concat(this.$route.params.file_doc_ref)
+        }
+        await updateDoc(currentUserDocRef,changeDetail)
+        window.location.reload()
+      }
+      else
+      {
+        alert("You already fav this shit.")
+      }
+      
+      
+    },
+    async onCommentEnter(){
+      const new_comment = {
+        display_name:this.user.display_name,
+        identifier_email:this.user.identifier_email,
+        created_date:Timestamp.now(),
+        img_url:this.user.photo_url,
+        msg:this.comment_input
+      }
+      const db = getFirestore()
+      var current_comments = this.file.comments
+      current_comments.push(new_comment)
+      const changeDetail = {
+        comments:current_comments
+      }
+      const materialDocRef = doc(db,"material/"+this.$route.params.file_doc_ref)
+      await updateDoc(materialDocRef,changeDetail)
+      this.comment_input= ""
+    }
     
     
     
@@ -245,12 +299,63 @@ export default {
                           </form>
 
                           <div class="row justify-content-center align-items-center g-2 mt-5 text-center">
-                            <p>กดหัวใจและติดดาวตรงนี้</p>
-                            <p>แสดงจำนวนคะแนนคนที่กดหัวใจตรงนี้</p>
+                            <span>
+                              <p>กดหัวใจและติดดาวตรงนี้</p>
+                              <button class="mx-3 btn btn-primary btn-sm" @click="onLikeClick">
+                                <span class="material-symbols-outlined align-bottom">thumb_up</span>
+                                <span class="align-text-middle">
+                                  Like
+                                </span>
+                              </button>
+
+                              <button class="mx-3 btn btn-danger btn-sm" @click="onFavClick">
+                                <span class="material-symbols-outlined align-bottom">favorite</span>
+                                <span class="align-text-middle">
+                                  Love
+                                </span>
+                              </button>
+                            </span>
+                            <p>แสดงจำนวนคะแนนคนที่กดหัวใจตรงนี้</p><br>
+                            {{ file.likes != undefined ? file.likes.length : 0 }} Liked this material. <br>
                           </div>
                         </div>
                       </div>
                       <p class="text-center">แสดงคอมเม้นต์และคอมเม้นต์ไฟล์ตรงนี้</p>
+                      <div>
+
+                        <div v-for="comment in file.comments" style="border: 1px solid black;" class="row mb-3">
+                          <div class="col-1 d-flex align-items-center">
+                            <img :src=comment.img_url :alt="comment.display_name + 'img'" class="close-image" style="scale: 0.5;"/>
+                          </div>
+                          <div class="col-3 d-flex align-items-center text-end">
+                            {{ comment.display_name }} <br>
+                            {{ comment.identifier_email }}
+                          </div>
+                          <div class="col-6 d-flex align-items-center">
+                            {{ comment.msg }}
+                          </div>
+                          <div class="col-2 d-flex align-items-center">
+                            {{ comment.created_date.toDate().toDateString() }}
+                            {{ comment.created_date.toDate().toLocaleTimeString() }}
+                          </div>
+                        </div>
+
+                        <div class="row" style="border: 1px solid black;">
+                          <div class="col-1 d-flex align-items-center">
+                            <div v-if="user?.photo_url != ''">
+                              <img :src=user.photo_url alt="user_img" class="close-image" style="scale: 0.5;">
+                            </div>
+                          </div>
+                          <div class="col-3 d-flex align-items-center text-end">
+                            {{ user.display_name }} <br>
+                            {{ user.identifier_email }}
+                          </div>
+                          <div class="col-8 d-flex align-items-center">
+                            <input v-model="comment_input" type="text" class="w-100" v-on:keyup.enter="onCommentEnter()">
+                          </div>
+                        </div>
+
+                      </div>
                       <footer>
                                 <div class="container py-4 py-lg-5 mt-5">
                                     <div class="row row-cols-2 row-cols-md-4">
