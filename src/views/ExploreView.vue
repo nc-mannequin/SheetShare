@@ -17,8 +17,8 @@ export default {
         user:{},
         allPublicFile:{},
         master_data:{},
-        level_filter:"",
-        subject_filter:"",
+        level_filter:"All",
+        subject_filter:"All",
         }
     },
     beforeMount () {
@@ -43,7 +43,6 @@ export default {
             (snapShot) => {
                 this.allPublicFile = snapShot.docs.map(doc => [doc.id, doc.data()])
                 this.allPublicFile.forEach((material) => {
-                    console.log(material)
                     const storage = getStorage();
                     const fileRef = ref(storage, material[1].file_url);
                     getDownloadURL(fileRef).then((url) => { material[1].source = url })
