@@ -32,6 +32,7 @@ export default{
         file_upload_error: false,
         allPublicFile:{},
         joke: "",
+        fav_materials:[],
     }
   },
   async beforeMount () {
@@ -86,6 +87,12 @@ export default{
       onSnapshot(materialColRef,(snapShot) => {
         this.own_materials = snapShot.docs.map(doc => [doc.id,doc.data()]).filter(f => this.user.own_materials_id.includes(f[0]))
         this.own_materials.forEach((material) => {
+          const storage = getStorage();
+          const fileRef = ref(storage, material[1].file_url);
+          getDownloadURL(fileRef).then((url) => {material[2] = url}).catch((err)=>{console.log(err)})
+        })
+        this.fav_materials = snapShot.docs.map(doc => [doc.id,doc.data()]).filter(f => this.user.fav_materials_id.includes(f[0]))
+        this.fav_materials.forEach((material) => {
           const storage = getStorage();
           const fileRef = ref(storage, material[1].file_url);
           getDownloadURL(fileRef).then((url) => {material[2] = url}).catch((err)=>{console.log(err)})
@@ -515,7 +522,7 @@ export default{
                     <div>
                       <button class="btn btn-default"  @click="fetchJoke()">Joke</button>
                       <br>
-                      <p3 class="mt-2">{{joke}}</p3>
+                      <p class="mt-2">{{joke}}</p>
                     </div>
 
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
@@ -558,7 +565,7 @@ export default{
                     </div>
                     <div class="container mt-4">
                         <div class="row row-cols-1 row-cols-md-2 g-4">
-                          เร็ว ๆ นี้เนาะ ใจเย็นดิเตง
+                          <MyFileComponent v-for="material, i in fav_materials" :material="material" :key="i"></MyFileComponent>
                         </div>
                       </div>
                   </div>
