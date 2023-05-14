@@ -135,7 +135,38 @@ export default {
   },
   
   // ===============================================================================================================
-    
+  onDownloadFile(path){
+      // Create a reference to the file we want to download
+      console.log(path)
+      const storage = getStorage();
+      const starsRef = ref(storage, path);
+      getDownloadURL(starsRef)
+      .then((url)=>{
+        console.log(url)
+        const xhr = new XMLHttpRequest()
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+          const blob = xhr.response;
+        };
+        xhr.onloadend = (event) => {
+          console.log(path)
+          console.log(event)
+          console.log(xhr)
+          const url = window.URL.createObjectURL(xhr.response);
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', path.slice(42));
+          document.body.appendChild(link);
+          link.click();
+        }
+        
+        xhr.open('GET', url);
+        xhr.send();
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    },
     
     
     }
@@ -262,7 +293,7 @@ export default {
                           <div class="row mt-2">
                             <div class="btn-group" role="group">
                                 <a :href=file.source target="_blank" rel="noopener noreferrer"><button type="button" class="btn btn-dark"><span class="material-symbols-outlined me-2 thispage">open_in_new</span>Preview in New Tab</button></a>
-                                <button type="button" class="btn btn-success"><span class="material-symbols-outlined mx-2 thispage">download</span>Download</button>
+                                <button type="button" class="btn btn-success" @click="onDownloadFile(file.file_url)"><span class="material-symbols-outlined mx-2 thispage">download</span>Download</button>
                             </div>
                         </div>
                         </div>
