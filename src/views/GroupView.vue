@@ -284,7 +284,7 @@ export default {
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
                       <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">
                           <div class="row justify-content-center align-items-center g-2">
-                            <div class="col-3 text-end me-2"><span class="material-symbols-outlined">logout</span></div>
+                            <div class="col-md-3 text-center"><span class="material-symbols-outlined">logout</span></div>
                             <div class="col-9 text-center"><span>Logout</span></div>
                           </div>
                       </button>
