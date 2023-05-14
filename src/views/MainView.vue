@@ -3,6 +3,7 @@ import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
 import MyFileComponent from '../components/MyFileComponent.vue';
+import axios from 'axios';
 
 export default{
   name: 'HomePage',
@@ -30,6 +31,7 @@ export default{
         file_type_error: false,
         file_upload_error: false,
         allPublicFile:{},
+        joke: "",
     }
   },
   async beforeMount () {
@@ -129,6 +131,19 @@ export default{
         })
 
     // console.log(this.group_member['k40udYYsJqxLWJc2GyVd','OBCdVKibs0Q2kW6VT6OZnyAwsFj2'])
+
+    // ======================================= getDadJoKe ======================================
+
+    axios.get('https://icanhazdadjoke.com/', { headers: { "Accept": "text/plain" } })
+        .then((res) => {
+          console.log(res)
+          this.joke = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
+    // =============================================================================
     
   },
   methods: {
@@ -416,6 +431,21 @@ export default{
         this.file_upload_error = false
       }
     },
+
+    // ===============================================================================================================
+
+    async fetchJoke() {
+      axios.get('https://icanhazdadjoke.com/', { headers: { "Accept": "text/plain" } })
+        .then((res) => {
+          console.log(res)
+          this.joke = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+  },
+  
+  // ===============================================================================================================
     
 
       
@@ -481,6 +511,11 @@ export default{
                                 </li>
                             </ul>
                         </div>
+                    </div>
+                    <div>
+                      <button class="btn btn-default"  @click="fetchJoke()">Joke</button>
+                      <br>
+                      <p3 class="mt-2">{{joke}}</p3>
                     </div>
 
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
