@@ -145,22 +145,29 @@ export default {
       
     },
     async onCommentEnter(){
-      const new_comment = {
-        display_name:this.user.display_name,
-        identifier_email:this.user.identifier_email,
-        created_date:Timestamp.now(),
-        img_url:this.user.photo_url,
-        msg:this.comment_input
+      if(this.comment_input.trim().length == 0){
+        alert("U sending nothing. idiot.")
       }
-      const db = getFirestore()
-      var current_comments = this.file.comments
-      current_comments.push(new_comment)
-      const changeDetail = {
-        comments:current_comments
+      else
+      {
+        const new_comment = {
+          display_name:this.user.display_name,
+          identifier_email:this.user.identifier_email,
+          created_date:Timestamp.now(),
+          img_url:this.user.photo_url,
+          msg:this.comment_input
+        }
+        const db = getFirestore()
+        var current_comments = this.file.comments
+        current_comments.push(new_comment)
+        const changeDetail = {
+          comments:current_comments
+        }
+        const materialDocRef = doc(db,"material/"+this.$route.params.file_doc_ref)
+        await updateDoc(materialDocRef,changeDetail)
+        this.comment_input= ""
       }
-      const materialDocRef = doc(db,"material/"+this.$route.params.file_doc_ref)
-      await updateDoc(materialDocRef,changeDetail)
-      this.comment_input= ""
+      
     },
     onDownloadFile(path){
       // Create a reference to the file we want to download
@@ -404,7 +411,7 @@ export default {
                         <div class="row mt-3">
                           <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">chat</span>Comments</span></h2>
                         </div>
-                        <div style="overflow: scroll; sticky: bottom;">
+                        <div style="overflow-y: scroll; height: 60vh;">
 
                           <div v-for="comment in file.comments" class="container my-3 border border-1 border-warning">
                             <div class="row my-3">
