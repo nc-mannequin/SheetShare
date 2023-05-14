@@ -16,6 +16,9 @@ export default {
         userId:"",
         user:{},
         allPublicFile:{},
+        master_data:{},
+        level_filter:"",
+        subject_filter:"",
         }
     },
     beforeMount () {
@@ -45,10 +48,17 @@ export default {
                     const fileRef = ref(storage, material[1].file_url);
                     getDownloadURL(fileRef).then((url) => { material[1].source = url })
                 })
-                console.log(this.allPublicFile)
             },
             (err) => { console.log(err) }
         )
+        const MasterDataColRef = collection(db,"master_data")
+        onSnapshot(MasterDataColRef
+        ,(snapShot) => {
+          this.master_data = snapShot.docs.map(doc => doc.data())
+          this.master_data[0].options = ["All"].concat(this.master_data[0].options)
+          this.master_data[1].options = ["All"].concat(this.master_data[1].options)
+        }
+        ,(err) => {console.log(err)})
     },
     methods: {
     logout () {
@@ -65,6 +75,36 @@ export default {
     refreshpage () {
         window.location.reload();
     },
+    },
+    computed:{
+      filtered_file : function(){
+        if(this.allPublicFile.length > 0){
+          if(this.level_filter != "All" && this.subject_filter != "All"){
+            return this.allPublicFile.filter((file) => {
+              return file[1].level == this.level_filter && file[1].subject == this.subject_filter
+            })
+          }
+          else if(this.level_filter != "All" && this.subject_filter == "All"){
+            return this.allPublicFile.filter((file) => {
+              return file[1].level == this.level_filter
+            })
+          }
+          else if(this.level_filter == "All" && this.subject_filter != "All"){
+            return this.allPublicFile.filter((file) => {
+              return file[1].subject == this.subject_filter
+            })
+          }
+          else
+          {
+            return this.allPublicFile
+          }
+        }
+        else
+        {
+          return []
+        }
+        
+      }
     }
 }
 </script>
@@ -147,10 +187,30 @@ export default {
                     <div class="row mt-3">
                         <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">explore</span>Explore</span></h2>
                     </div>
+
+                    <div class="row mt-3">
+                      <label for="levelDropdown" class="form-label"><h5 class="mx-3 text-start"><strong>Level</strong><span class="text-danger">*</span></h5></label>
+                      <div class="input-group px-3">
+                        <select class="form-select mb-1" id="levelDropdown" placeholder="Please select ..." v-model="level_filter" required>
+                          <option v-for="level in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'level').options : []" :value=level>{{ level }}</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="row mt-3">
+                      <label for="subjectDropdown" class="form-label"><h5 class="mx-3 text-start"><strong>Subject</strong><span class="text-danger">*</span></h5></label>
+                      <div class="input-group px-3">
+                        <select class="form-select mb-1" id="subjectDropdown" placeholder="Please select ..." v-model="subject_filter" required>
+                          <option v-for="subject in this.master_data.length > 0 ? this.master_data.find(opt => opt.option_name == 'subject').options : []" :value=subject>{{ subject }}</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    
                   <div class="mt-4">
                     <div class="container mt-4">
                         <div class="row row-cols-1 row-cols-md-2 g-4">
-                          <ExploreComponent v-for="file, i in allPublicFile" :file="file" :key="i"></ExploreComponent>
+                          <ExploreComponent v-for="file, i in filtered_file" :file="file" :key="i"></ExploreComponent>
                         </div>
                       </div>
                   </div>
