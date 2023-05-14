@@ -3,6 +3,7 @@ import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
 import VuePdfEmbed from 'vue-pdf-embed'
+import axios from 'axios';
 
 export default {
     name: 'EditFile',
@@ -20,6 +21,7 @@ export default {
         master_data:{},
         page: 1,
         pageCount: 1,
+        joke: "",
         }
     },
     beforeMount () {
@@ -59,6 +61,20 @@ export default {
         this.master_data = snapShot.docs.map(doc => doc.data())
         }
         ,(err) => {console.log(err)})
+
+        // ======================================= getDadJoKe ======================================
+
+    axios.get('https://icanhazdadjoke.com/', { headers: { "Accept": "text/plain" } })
+        .then((res) => {
+          console.log(res)
+          this.joke = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
+    // =============================================================================
+
     },
     methods: {
     logout () {
@@ -104,6 +120,21 @@ export default {
       this.$router.replace('/home')
       window.location.reload();
     },
+
+        // ===============================================================================================================
+
+     async fetchJoke() {
+      axios.get('https://icanhazdadjoke.com/', { headers: { "Accept": "text/plain" } })
+        .then((res) => {
+          console.log(res)
+          this.joke = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+  },
+  
+  // ===============================================================================================================
     
     
     
@@ -170,6 +201,16 @@ export default {
                         </div>
                     </div>
 
+                    <div class="row mx-4 mt-2">
+                      <h6><strong><span style="text-decoration-line: underline; text-decoration-thickness: 5px; text-decoration-color: #ffd200;">Short Joke for YOU!</span></strong></h6>
+                      <p><em>&nbsp; {{ joke }}</em></p>
+                    </div>
+                    <div class="row mx-4">
+                      <button type="button" class="btn btn-primary btn-sm" style="--bs-btn-font-size: 0.75rem;" @click="fetchJoke()">
+                            <div class="text-center justify-content-center align-items-center"><span class="material-symbols-outlined me-2" style="font-size: 1.15rem;">shuffle</span><span>New Joke</span></div>
+                      </button>
+                    </div>
+
                     <div class="d-grid gap-2 text-center mt-5 mx-4">
                       <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop-logout">
                           <div class="row justify-content-center align-items-center g-2">
@@ -218,6 +259,12 @@ export default {
                               </div>
                             </div>
                           </div>
+                          <div class="row mt-2">
+                            <div class="btn-group" role="group">
+                                <a :href=file.source target="_blank" rel="noopener noreferrer"><button type="button" class="btn btn-dark"><span class="material-symbols-outlined me-2 thispage">open_in_new</span>Preview in New Tab</button></a>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop-delete"><span class="material-symbols-outlined mx-2 thispage">download</span>Download</button>
+                            </div>
+                        </div>
                         </div>
                         <div class="col-md-6">
                           <form class="mx-3">
