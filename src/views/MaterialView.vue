@@ -324,6 +324,11 @@ export default {
                                 <button type="button" class="btn btn-success" @click="onDownloadFile(file.file_url)"><span class="material-symbols-outlined mx-2 thispage">download</span>Download</button>
                             </div>
                         </div>
+                        <div class="row mt-2">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop-addgroup"><span class="material-symbols-outlined mx-2 thispage">add</span>Add To Group</button>
+                            </div>
+                        </div>
                         </div>
                         <div class="col-md-6">
                             <div class="card border-0 my-3">
@@ -369,61 +374,104 @@ export default {
                                 </div>
                           </form>
 
-                          <div class="row justify-content-center align-items-center g-2 mt-5 text-center">
-                            <span>
-                              <p>กดหัวใจและติดดาวตรงนี้</p>
-                              <button class="mx-3 btn btn-primary btn-sm" @click="onLikeClick">
-                                <span class="material-symbols-outlined align-bottom">thumb_up</span>
-                                <span class="align-text-middle">
-                                  Like
-                                </span>
-                              </button>
-
-                              <button class="mx-3 btn btn-danger btn-sm" @click="onFavClick">
-                                <span class="material-symbols-outlined align-bottom">favorite</span>
-                                <span class="align-text-middle">
-                                  Love
-                                </span>
-                              </button>
-                            </span>
-                            <p>แสดงจำนวนคะแนนคนที่กดหัวใจตรงนี้</p><br>
-                            {{ file.likes != undefined ? file.likes.length : 0 }} Liked this material. <br>
+                          <div class="justify-content-center align-items-center g-2 mt-2 text-center">
+                            <div class="row">
+                                <div class="text-center mt-4">
+                                  <button class="mx-1 btn btn-primary btn-sm" @click="onLikeClick">
+                                    <span class="material-symbols-outlined align-bottom">thumb_up</span>
+                                    <span class="align-text-middle">
+                                      Like
+                                    </span>
+                                  </button>
+                                  <button class="mx-1 btn btn-danger btn-sm" @click="onFavClick">
+                                    <span class="material-symbols-outlined align-bottom">favorite</span>
+                                    <span class="align-text-middle">
+                                      Love
+                                    </span>
+                                  </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                              <div class="text-center mt-4">
+                                {{ file.likes != undefined ? file.likes.length : 0 }} Liked this material.
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <p class="text-center">แสดงคอมเม้นต์และคอมเม้นต์ไฟล์ตรงนี้</p>
-                      <div>
 
-                        <div v-for="comment in file.comments" style="border: 1px solid black;" class="row mb-3">
-                          <div class="col-1 d-flex align-items-center">
-                            <img :src=comment.img_url :alt="comment.display_name + 'img'" class="close-image" style="scale: 0.5;"/>
-                          </div>
-                          <div class="col-3 d-flex align-items-center text-end">
-                            {{ comment.display_name }} <br>
-                            {{ comment.identifier_email }}
-                          </div>
-                          <div class="col-6 d-flex align-items-center">
-                            {{ comment.msg }}
-                          </div>
-                          <div class="col-2 d-flex align-items-center">
-                            {{ comment.created_date.toDate().toDateString() }}
-                            {{ comment.created_date.toDate().toLocaleTimeString() }}
-                          </div>
+                      <div class="container mt-5">
+                        <div class="row mt-3">
+                          <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">chat</span>Comments</span></h2>
                         </div>
+                        <div style="overflow: scroll; sticky: bottom;">
 
-                        <div class="row" style="border: 1px solid black;">
-                          <div class="col-1 d-flex align-items-center">
-                            <div v-if="user?.photo_url != ''">
-                              <img :src=user.photo_url alt="user_img" class="close-image" style="scale: 0.5;">
+                          <div v-for="comment in file.comments" class="container my-3 border border-1 border-warning">
+                            <div class="row my-3">
+                              <div class="col-4 col-md-2 text-center">
+                                <img :src=comment.img_url :alt="comment.display_name + 'img'" class="close-image" style="scale: 0.7;"/>
+                              </div>
+                              <div class="col-8 col-md-7 align-self-center">
+                                <div class="row">
+                                  <h4><strong> {{ comment.display_name }} </strong></h4>
+                                </div>
+                                <div class="row">
+                                  <h6><small><small>{{ comment.identifier_email }}</small></small></h6>
+                                </div>
+                              </div>
+                              <div class="col-12 col-md-3 align-self-center text-end">
+                                <div class="row my-1">
+                                  <h6><small>{{ comment.created_date.toDate().toDateString() }}</small></h6>
+                                </div>
+                                <div class="row my-1">
+                                  <h6><small>{{ comment.created_date.toDate().toLocaleTimeString() }}</small></h6>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row my-3">
+                                <div class="align-items-center px-4">
+                                  {{ comment.msg }}
+                                </div>
+                              </div>
+                          </div>
+                        
+                        </div>
+                        <div class="row mt-3">
+                          <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">add_comment</span>Add Comment</span></h2>
+                        </div>
+                        <div class="container my-3 border border-1 border-warning">
+                          <div class="row my-3">
+                            <div class="col-4 col-md-2 text-center">
+                              <div v-if="user?.photo_url != ''">
+                                <img :src=user.photo_url alt="user_img" class="close-image" style="scale: 0.5;">
+                              </div>
+                            </div>
+                            <div class="col-8 col-md-7 align-self-center">
+                              <div class="row">
+                                <h4><strong> {{ user.display_name }} </strong></h4>
+                              </div>
+                              <div class="row">
+                                <h6><small><small>{{ user.identifier_email }}</small></small></h6>
+                              </div>
+                            </div>
+                            <div class="col-12 col-md-3 align-self-center text-end">
+                              <div class="row my-1">
+                                <h6><small></small></h6>
+                              </div>
+                              <div class="row my-1">
+                                <h6><small></small></h6>
+                              </div>
                             </div>
                           </div>
-                          <div class="col-3 d-flex align-items-center text-end">
-                            {{ user.display_name }} <br>
-                            {{ user.identifier_email }}
-                          </div>
-                          <div class="col-8 d-flex align-items-center">
-                            <input v-model="comment_input" type="text" class="w-100" v-on:keyup.enter="onCommentEnter()">
-                          </div>
+                          <div class="row my-3">
+                              <div class="align-items-center px-4">
+                                <div class="form-floating">
+                                  <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea" v-model="comment_input" v-on:keyup.enter="onCommentEnter()"></textarea>
+                                  <label for="floatingTextarea">Comments</label>
+                                </div>
+                                <h6 class="text-end"><small><small>Please add your comments below and then press enter to submit.</small></small></h6>
+                              </div>
+                            </div>
                         </div>
 
                       </div>
@@ -466,37 +514,27 @@ export default {
           </div>
     </div>
 
-    <div class="modal fade" id="staticBackdrop-cancel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog">
+    <div class="modal fade" id="staticBackdrop-addgroup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
               <div class="modal-header">
-                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Cancel Confirmation</strong></h1>
+                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>&nbsp; Add To Group &nbsp;</strong></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body">
-                Are you sure you want to cancel? Any unsaved progress will be lost.
+              <div class="modal-body mb-3">
+                <div class="row mt-2 px-1" id="liveAlertPlaceholder-Upload"></div>
+                <form class="g-3 needs-validation" novalidate>
+                  <label for="groupDropdown" class="form-label"><h5 class="mx-3 text-start"><strong>Select Group</strong><span class="text-danger">*</span></h5></label>
+                  <div class="input-group px-3">
+                    <select class="form-select mb-1" id="groupDropdown" placeholder="Please select ..." required>
+                      <!-- <option v-for=" ">{{  }}</option> -->
+                    </select>
+                  </div>
+                </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" @click="onReloadClick">Yes</button>
-              </div>
-            </div>
-          </div>
-    </div>
-
-    <div class="modal fade" id="staticBackdrop-delete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Delete Material Confirmation</strong></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                Are you sure you want to delete this material? Once deleted it cannot be recovered.
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" @click="onReloadClick">DELETE</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Add</button>
               </div>
             </div>
           </div>
