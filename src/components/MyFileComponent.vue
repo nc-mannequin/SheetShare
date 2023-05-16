@@ -39,8 +39,8 @@ export default {
                     <div class="row text-center mt-3 pt-3">
                         <RouterLink :to="{ path: '/edit_file', name: 'edit_file', params: { file_doc_ref: material[0] } }"  >
                             <button class="btn btn-warning" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-                                <span class="material-symbols-outlined me-3 thispage" style="font-size: 1.15rem;">edit</span>
-                                Edit
+                                <span class="material-symbols-outlined me-2 thispage" style="font-size: 1.15rem;">edit</span>
+                                <span class="me-2">Edit</span>
                             </button>
                         </RouterLink>
                     </div>
