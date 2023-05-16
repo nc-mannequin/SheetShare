@@ -72,18 +72,21 @@ export default {
                   getDoc(materialDocRef).then((result) => {
                     var material_data = result.data()
                     //Get file_url
-                    const storage = getStorage();
-                    const fileRef = ref(storage, material_data.file_url);
-                    getDownloadURL(fileRef).then((url)=>{
-                      material_data.source = url
-                    }).then(()=>{
-                      if(this.user_group[index][1].file == undefined){
-                        this.user_group[index][1].file = []
-                      }
-                      this.user_group[index][1].file.push([id,material_data])
-                    })
+                    try{
+                      const storage = getStorage();
+                      const fileRef = ref(storage, material_data.file_url);
+                      getDownloadURL(fileRef).then((url)=>{
+                        material_data.source = url
+                      }).then(()=>{
+                        if(this.user_group[index][1].file == undefined){
+                          this.user_group[index][1].file = []
+                        }
+                        this.user_group[index][1].file.push([id,material_data])
+                      })
+                    }
+                    catch(e){}
                     
-                  })                
+                  })            
                 }
                 console.log(this.user_group[index][1])
               }
@@ -448,7 +451,7 @@ export default {
                                       <div class="container mt-4">
                                         <div v-if="selected_group[1].materials.length != 0" style="overflow-y: scroll; overflow-x: hidden; height: 60vh;">
                                           <div class="row row-cols-1 row-cols-md-2 g-4">
-                                            <GroupComponent v-for="file, i in selected_group[1].file" :file="file" :key="i"></GroupComponent>
+                                            <GroupComponent v-for="file, i in selected_group[1].file" :file="file" :group="selected_group[1]" :groupRef="selected_group[0]" :key="i"></GroupComponent>
                                           </div>
                                         </div>
                                       </div>

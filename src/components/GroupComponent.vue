@@ -1,8 +1,8 @@
 <script>
-
+import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp, setDoc, query, where, getDocs, deleteDoc, getDoc } from 'firebase/firestore'
 export default {
     name: 'Group',
-    props: ['file'],
+    props: ['file','group','groupRef'],
     components: {
     },
     data() {
@@ -10,6 +10,14 @@ export default {
         }
     },
     methods:{
+      async onDeleteClick(){
+        const db = getFirestore()
+        const groupDocRef = doc(db,"group/"+this.groupRef)
+        const changeDetail = {
+          materials:this.group.materials.filter(f => f != this.file[0])
+        }
+        await updateDoc(groupDocRef,changeDetail).then(()=>{window.location.reload()})
+      }
         
     },
 }
@@ -53,7 +61,7 @@ export default {
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger">DELETE</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="onDeleteClick">DELETE</button>
               </div>
             </div>
           </div>
