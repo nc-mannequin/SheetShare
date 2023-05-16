@@ -4,13 +4,13 @@ import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp, setDoc
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import VueMultiselect  from 'vue-multiselect'
 import axios from 'axios';
-import ExploreComponent from '../components/ExploreComponent.vue';
+import GroupComponent from '../components/GroupComponent.vue';
 
 export default {
     name: 'Profile',
     components: {
       VueMultiselect ,
-      ExploreComponent,
+      GroupComponent,
     },
     data() {
         return {
@@ -380,7 +380,7 @@ export default {
                   </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-3 border-end" style="overflow-y: scroll; height: 80vh;">
+                        <div class="col-md-3 border-end" style="overflow-y: scroll; height: 100vh;">
                           <h3 class="text-center underline mb-3">My Group</h3>
                             <div class="list-group">
                               <button v-for="(group, group_index) in user_group" @click="onGroupSelect(group)" class="text-start list-group-item list-group-item-action list-group-item-light text-dark">{{ group[1].group_name }}</button>
@@ -448,7 +448,7 @@ export default {
                                       <div class="container mt-4">
                                         <div v-if="selected_group[1].materials.length != 0" style="overflow-y: scroll; overflow-x: hidden; height: 60vh;">
                                           <div class="row row-cols-1 row-cols-md-2 g-4">
-                                            <ExploreComponent v-for="file, i in selected_group[1].file" :file="file" :key="i"></ExploreComponent>
+                                            <GroupComponent v-for="file, i in selected_group[1].file" :file="file" :key="i"></GroupComponent>
                                           </div>
                                         </div>
                                       </div>
@@ -463,7 +463,7 @@ export default {
                                   </h2>
                                   <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
                                     <div class="accordion-body">
-                                      <div class="container mt-5">
+                                      <div class="container mt-1">
 
                                         <div v-if="selected_group[1].comments.length != 0" style="overflow-y: scroll; height: 60vh;">
 
