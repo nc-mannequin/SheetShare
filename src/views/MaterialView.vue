@@ -1,13 +1,15 @@
 <script>
 import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
-import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
+import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where, Firestore } from 'firebase/firestore'
 import VuePdfEmbed from 'vue-pdf-embed'
 import axios from 'axios';
+import VueMultiselect  from 'vue-multiselect'
 
 export default {
     name: 'Material',
     components: {
+      VueMultiselect ,
         VuePdfEmbed,
     },
     data() {
@@ -24,7 +26,9 @@ export default {
             photo_url: ""
         },
         joke: "",
-        comment_input:""
+        comment_input:"",
+        selected_group:[],
+        user_group_opt:[]
         }
     },
     beforeMount () {
@@ -42,6 +46,17 @@ export default {
             const exist_user = snapShot.docs.map(doc => [doc.id,doc.data()] ).filter(f => f[1].user_id == current_user.uid)
             this.userId = exist_user[0][0]
             this.user = exist_user[0][1]
+            this.user.group_id.forEach(id => {
+              const groupDocRef = doc(db,"group/"+id)
+              getDoc(groupDocRef).then((result)=>{
+                var record = result.data()
+                record.id = result.id
+                this.user_group_opt.push(record)
+                console.log(this.user_group_opt)
+              })
+              
+            });
+            
 
             const docRef = doc(db,"material/"+this.$route.params.file_doc_ref)
             await getDoc(docRef)
@@ -51,14 +66,12 @@ export default {
                 const fileRef = ref(storage, this.file.file_url);
                 getDownloadURL(fileRef).then((url) => {
                     this.file.source = url
-                    console.log(this.file)
                 })
             })
 
             const owner_user = snapShot.docs.map(doc => [doc.id,doc.data()] ).filter(f => f[1].user_id == this.file.user_id)
             this.owner.display_name = owner_user[0][1].display_name
             this.owner.photo_url = owner_user[0][1].photo_url
-            console.log(this.owner)
 
 
         },(err)=>{console.log(err)})
@@ -75,6 +88,7 @@ export default {
         })
 
 // =============================================================================
+        
 
     },
     methods: {
@@ -201,9 +215,37 @@ export default {
         console.log(error)
       })
     },
-    
-    
+    onAddFileToGroupClick(){
+      console.log(this.selected_group)
+      if(this.selected_group.length > 0){
+        var number_of_success_records = 0
+        const db = getFirestore()
+        this.selected_group.forEach(async group => {
+          const groupDocRef = doc(db,"group/"+group.id)
+          var current_materials = group.materials
+          current_materials.push(this.$route.params.file_doc_ref)
+          current_materials = [...new Set(current_materials)]
+          
+          const changeDetail = {
+            materials:current_materials
+          }
+          console.log(changeDetail)
+          await updateDoc(groupDocRef,changeDetail).then(()=>{
+            number_of_success_records = number_of_success_records + 1
+            if(number_of_success_records == this.selected_group.length){
+              window.location.reload()
+              this.selected_group = []
+            }
+          })
+        })
+        
+      }
+      
+
     }
+    
+    
+    },
 }
 </script>
 
@@ -533,15 +575,30 @@ export default {
                 <form class="g-3 needs-validation" novalidate>
                   <label for="groupDropdown" class="form-label"><h6 class="mx-3 text-start"><strong>Select Group</strong><span class="text-danger">*</span></h6></label>
                   <div class="input-group px-3">
-                    <select class="form-select mb-1" id="groupDropdown" placeholder="Please select ..." required>
-                      <!-- <option v-for=" ">{{  }}</option> -->
-                    </select>
+                    <VueMultiselect
+                                          v-model="selected_group"
+                                          :options="user_group_opt != undefined ? user_group_opt.filter(group => !group.materials.includes(this.$route.params.file_doc_ref)) : []"
+                                          :multiple="true"
+                                          :close-on-select="false"
+                                          :clear-on-select="false"
+                                          :preserve-search="true"
+                                          placeholder="Select group"
+                                          label="group_name"
+                                          track-by="id" 
+                                          >
+                                          <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }} options selected</span></template>
+                                        </VueMultiselect>
+                    <!-- <select class="form-select mb-1" id="groupDropdown" placeholder="Please select ..." required v-model="selected_group">
+                      <option v-for="group in user_groups">
+                        {{ group.group_name }}
+                      </option>
+                    </select> -->
                   </div>
                 </form>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Add</button>
+                <button type="button" class="btn btn-primary" @click="onAddFileToGroupClick">Add</button>
               </div>
             </div>
           </div>
