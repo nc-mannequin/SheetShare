@@ -1,15 +1,16 @@
 <script>
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth'
-import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp, setDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore'
+import { collection, onSnapshot, doc, getFirestore, updateDoc, Timestamp, setDoc, query, where, getDocs, deleteDoc, getDoc } from 'firebase/firestore'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import VueMultiselect  from 'vue-multiselect'
 import axios from 'axios';
-
+import ExploreComponent from '../components/ExploreComponent.vue';
 
 export default {
     name: 'Profile',
     components: {
-      VueMultiselect 
+      VueMultiselect ,
+      ExploreComponent,
     },
     data() {
         return {
@@ -44,6 +45,7 @@ export default {
             {
               this.user_group = snapShot.docs.map(doc => [doc.id,doc.data()]).filter(f => this.user.group_id.includes(f[0]))
               for (let index = 0; index < this.user_group.length; index++) {
+                //Joining user_name
                 const target_group_members_id = this.user_group[index][1].members
                 target_group_members_id.forEach(async id => {
                   const queryCondition = query(collection(db,"user"), where("user_id","==",id))
@@ -60,6 +62,30 @@ export default {
                   // [this.user_group[index][0]][id] = target_user.docs[0].data().display_name
                   // this.group_member[this.user_group[index][0]][id] == undefined ? [target_user.docs[0].data().display_name] : this.group_member[this.user_group[index][0]].concat(target_user.docs[0].data().display_name)
                 });
+
+                //Joining material source url
+                for (let file_index = 0; file_index < this.user_group[index][1].materials.length; file_index++) {
+                  //For each material ID
+                  const id = this.user_group[index][1].materials[file_index]
+                  const db = getFirestore()
+                  const materialDocRef = doc(db,"material/"+id)
+                  getDoc(materialDocRef).then((result) => {
+                    var material_data = result.data()
+                    //Get file_url
+                    const storage = getStorage();
+                    const fileRef = ref(storage, material_data.file_url);
+                    getDownloadURL(fileRef).then((url)=>{
+                      material_data.source = url
+                    }).then(()=>{
+                      if(this.user_group[index][1].file == undefined){
+                        this.user_group[index][1].file = []
+                      }
+                      this.user_group[index][1].file.push([id,material_data])
+                    })
+                    
+                  })                
+                }
+                console.log(this.user_group[index][1])
               }
             })
         },(err)=>{console.log(err)})
@@ -108,7 +134,7 @@ export default {
       const groupDocRef = doc(collection(db,"group"))
       const dataObj = {
           created_at: Timestamp.now(),
-          created_by: this.user.display_name,
+          created_by: this.user.user_id,
           description: this.group_des,
           group_name: this.group_text,
           materials:[],
@@ -161,7 +187,9 @@ export default {
     },
     async onAddMemberClick(group_key){
       const db = getFirestore()
-      console.log(this.selected_user)
+      if(this.selected_user.length > 0){
+
+      
       const queryCondition = query(collection(db,"user"), where("user_id","in",this.selected_user.map(user => user.user_id)))
       const target_users = await getDocs(queryCondition)
       if(target_users.empty){
@@ -194,6 +222,7 @@ export default {
       }
       this.selected_user = []
       window.location.reload()
+    }
     },
     onGroupSelect(group){
       this.selected_group = group
@@ -224,21 +253,21 @@ export default {
       }
       else
       {
-        // const new_comment = {
-        //   display_name:this.user.display_name,
-        //   identifier_email:this.user.identifier_email,
-        //   created_date:Timestamp.now(),
-        //   img_url:this.user.photo_url,
-        //   msg:this.comment_input
-        // }
-        // const db = getFirestore()
-        // var current_comments = this.file.comments
-        // current_comments.push(new_comment)
-        // const changeDetail = {
-        //   comments:current_comments
-        // }
-        // const materialDocRef = doc(db,"material/"+this.$route.params.file_doc_ref)
-        // await updateDoc(materialDocRef,changeDetail)
+        const new_comment = {
+          display_name:this.user.display_name,
+          identifier_email:this.user.identifier_email,
+          created_date:Timestamp.now(),
+          img_url:this.user.photo_url,
+          msg:this.comment_input
+        }
+        const db = getFirestore()
+        var current_comments = this.selected_group[1].comments
+        current_comments.push(new_comment)
+        const changeDetail = {
+          comments:current_comments
+        }
+        const groupDocRef = doc(db,"group/"+this.selected_group[0])
+        await updateDoc(groupDocRef,changeDetail)
         this.comment_input= ""
       }
       
@@ -417,9 +446,9 @@ export default {
                                   <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
                                     <div class="accordion-body">
                                       <div class="container mt-4">
-                                        <div v-if="selected_group[1].materials.length != 0" style="overflow-y: scroll; height: 60vh;">
+                                        <div v-if="selected_group[1].materials.length != 0" style="overflow-y: scroll; overflow-x: hidden; height: 60vh;">
                                           <div class="row row-cols-1 row-cols-md-2 g-4">
-                                            <ExploreComponent v-for="file, i in selected_group[1].materials" :file="file" :key="i"></ExploreComponent>
+                                            <ExploreComponent v-for="file, i in selected_group[1].file" :file="file" :key="i"></ExploreComponent>
                                           </div>
                                         </div>
                                       </div>
@@ -435,12 +464,16 @@ export default {
                                   <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
                                     <div class="accordion-body">
                                       <div class="container mt-5">
+
                                         <div v-if="selected_group[1].comments.length != 0" style="overflow-y: scroll; height: 60vh;">
 
                                           <div v-for="comment in selected_group[1].comments" class="container my-3 border border-1 border-warning">
                                             <div class="row my-3">
-                                              <div class="col-4 col-md-2 text-center">
+                                              <div class="col-4 col-md-2 text-center" v-if="comment.img_url != ''">
                                                 <img :src=comment.img_url :alt="comment.display_name + 'img'" class="close-image" style="scale: 0.7;"/>
+                                              </div>
+                                              <div v-else class="col-4 col-md-2 text-center">
+                                                <button class="btn btn-primary shadow btn-circle btn-xl btn-disabled" style="scale: 0.5;"><h3 class="mt-2">{{ user?.display_name ? user.display_name.charAt(0) : "" }}</h3></button>
                                               </div>
                                               <div class="col-8 col-md-7 align-self-center">
                                                 <div class="row">
@@ -475,6 +508,9 @@ export default {
                                             <div class="col-4 col-md-2 text-center">
                                               <div v-if="user?.photo_url != ''">
                                                 <img :src=user.photo_url alt="user_img" class="close-image" style="scale: 0.5;">
+                                              </div>
+                                              <div v-else>
+                                                <button class="btn btn-primary shadow btn-circle btn-xl btn-disabled" style="scale: 0.5;"><h3 class="mt-2">{{ user?.display_name ? user.display_name.charAt(0) : "" }}</h3></button>
                                               </div>
                                             </div>
                                             <div class="col-8 col-md-7 align-self-center">
