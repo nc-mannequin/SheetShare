@@ -40,6 +40,11 @@ export default {
             this.userId = exist_user[0][0]
             this.user = exist_user[0][1]
 
+            
+            if(!this.user.own_materials_id.includes(this.$route.params.file_doc_ref)){
+              this.$router.replace('/home')
+            }
+
             const docRef = doc(db,"material/"+this.$route.params.file_doc_ref)
             await getDoc(docRef)
             .then((result) => {
