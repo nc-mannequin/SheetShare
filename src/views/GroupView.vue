@@ -154,6 +154,8 @@ export default {
       }
       await updateDoc(docRef, dataObj)
 
+      window.location.reload();
+
       
     },
     async onAddMemberClick(group_key){
@@ -215,7 +217,15 @@ export default {
     this.group_text = ''
   },
 
-    }
+    },
+  computed: {
+    evenMembers() {
+      return this.selected_group[1].members.filter((_, index) => index % 2 === 0);
+    },
+    oddMembers() {
+      return this.selected_group[1].members.filter((_, index) => index % 2 !== 0);
+    },
+  },
 }
 </script>
 
@@ -317,43 +327,88 @@ export default {
                         <div class="col-md-3 border-end" style="overflow-y: scroll; height: 80vh;">
                           <h3 class="text-center underline mb-3">My Group</h3>
                             <div class="list-group">
-                              <button v-for="(group, group_index) in user_group" @click="onGroupSelect(group)" class="list-group-item list-group-item-action list-group-item-light">{{ group[1].group_name }}</button>
+                              <button v-for="(group, group_index) in user_group" @click="onGroupSelect(group)" class="text-start list-group-item list-group-item-action list-group-item-light text-dark">{{ group[1].group_name }}</button>
                             </div>
                         </div>
                         <div class="col-md-9" style="overflow-y: scroll; height: 100vh;" v-if="selected_group[1] != undefined">
                             <h2 class="text-center underline mb-3">&nbsp; {{ selected_group[1].group_name }} Group &nbsp;</h2>
                             <h5 class="text-center">{{ selected_group[1].description }}</h5>
-                            <h3>Members</h3>
-                            <ul>
-                              <li v-for="(member, member_index) in selected_group[1].members">
-                                {{ group_member[[selected_group[0], member]] }}
-                              </li>
-                            </ul>
-                            <h3>Materials</h3>
-                            <ul>
-                              <li v-for="(material, member_index) in selected_group[1].materials">
-                                {{ material }}
-                              </li>
-                            </ul>
 
-                            <VueMultiselect
-                            v-model="selected_user"
-                            :options="user_opt.filter(opt => !selected_group[1].members.includes(opt.user_id))"
-                            :multiple="true"
-                            :close-on-select="false"
-                            :clear-on-select="false"
-                            :preserve-search="true"
-                            placeholder="Select User"
-                            label="display_name"
-                            track-by="identifier_email"
-                            >
-                            <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }} options selected</span></template>
-                          </VueMultiselect>
-                            
-
-                          
-                            <button class="btn btn-default" @click="onAddMemberClick(selected_group[0])">Add Member</button>
-                            <button class="btn btn-default" @click="onLeaveGroupClick(selected_group[0])">Leave Group</button>
+                            <div class="accordion" id="accordionPanelsStayOpenExample">
+                              <div class="accordion-item">
+                                  <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                      <span class="material-symbols-outlined mx-2 thispage pt-1" style="font-size: 1rem;">diversity_3</span>Members
+                                    </button>
+                                  </h2>
+                                  <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+                                    <div class="accordion-body">
+                                      <div class="container">
+                                        <div class="row">
+                                          <div class="col-md-6">
+                                            <ul>
+                                              <li v-for="(member, index) in evenMembers" :key="index">
+                                                {{ group_member[[selected_group[0], member]] }}
+                                              </li>
+                                            </ul>
+                                          </div>
+                                          <div class="col-md-6">
+                                            <ul>
+                                              <li v-for="(member, index) in oddMembers" :key="index">
+                                                {{ group_member[[selected_group[0], member]] }}
+                                              </li>
+                                            </ul>
+                                          </div>
+                                        </div>
+                                        <p><strong>Add New Member:</strong></p>
+                                        <VueMultiselect
+                                          v-model="selected_user"
+                                          :options="user_opt.filter(opt => !selected_group[1].members.includes(opt.user_id))"
+                                          :multiple="true"
+                                          :close-on-select="false"
+                                          :clear-on-select="false"
+                                          :preserve-search="true"
+                                          placeholder="Select User"
+                                          label="display_name"
+                                          track-by="identifier_email" 
+                                          >
+                                          <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }} options selected</span></template>
+                                        </VueMultiselect>
+                                        <div class="text-end mt-4 p-0">
+                                          <button type="button" class="btn btn-primary shadow btn-sm" @click="onAddMemberClick(selected_group[0])"><span class="material-symbols-outlined mx-2 thispage pt-1" style="font-size: 1rem;">add</span></button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="accordion-item">
+                                  <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                                      <span class="material-symbols-outlined mx-2 thispage pt-1" style="font-size: 1rem;">description</span>Materials
+                                    </button>
+                                  </h2>
+                                  <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                      <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="accordion-item">
+                                  <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                                      <span class="material-symbols-outlined mx-2 thispage pt-1" style="font-size: 1rem;">chat</span>Comments
+                                    </button>
+                                  </h2>
+                                  <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                      <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="text-end mt-4 p-0">
+                              <button type="button" class="btn btn-danger shadow btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop-leavegroup"><span class="material-symbols-outlined mx-2 thispage pt-1" style="font-size: 1rem;">person_remove</span>Leave Group</button>
+                            </div>
                         </div>
                     </div>
                             <footer>
@@ -417,6 +472,24 @@ export default {
               <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="cancelNewGroup">Cancel</button>
                 <button type="button" class="btn btn-primary" @click="onNewGroupClick">New Group</button>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <div class="modal fade" id="staticBackdrop-leavegroup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Leave Group Confirmation</strong></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to leave this group?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" @click="onLeaveGroupClick(selected_group[0])">Leave Group</button>
               </div>
             </div>
           </div>

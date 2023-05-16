@@ -260,7 +260,6 @@ export default{
               level:this.upload_file_detail.level,
               likes:[],
               subject:this.upload_file_detail.subject,
-              tags:[],
               title:snapshot.metadata.fullPath.slice(42),
               user_id:this.user.user_id
             }

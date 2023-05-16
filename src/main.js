@@ -9,14 +9,13 @@ import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDmpQpD4A2xZP_UCzZNrG7jjiKRkNe2Z_4",
-    authDomain: "sheetshare-7e0d8.firebaseapp.com",
-    projectId: "sheetshare-7e0d8",
-    storageBucket: "sheetshare-7e0d8.appspot.com",
-    messagingSenderId: "981999077230",
-    appId: "1:981999077230:web:7a9f65b720039d6cd5237f",
-    measurementId: "G-7DXFYDKL4Z"
-  };
+  apiKey: "AIzaSyBgmQNgB-6ClJpVVKSAik9HhDAqagI6yWk",
+  authDomain: "sheetshare-75459.firebaseapp.com",
+  projectId: "sheetshare-75459",
+  storageBucket: "sheetshare-75459.appspot.com",
+  messagingSenderId: "380729054735",
+  appId: "1:380729054735:web:7d868f305560d4ef1c357a"
+};
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
