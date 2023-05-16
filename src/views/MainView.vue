@@ -3,11 +3,13 @@ import {getAuth, signOut, onAuthStateChanged} from 'firebase/auth'
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { collection,onSnapshot, doc, getFirestore, setDoc, updateDoc, deleteDoc, Timestamp, getDoc, getDocs, query, where } from 'firebase/firestore'
 import MyFileComponent from '../components/MyFileComponent.vue';
+import ExploreComponent from '../components/ExploreComponent.vue';
 import axios from 'axios';
 
 export default{
   name: 'HomePage',
   components: {
+    ExploreComponent,
     MyFileComponent,
   },
   data () {
@@ -568,7 +570,7 @@ export default{
                     </div>
                     <div class="container mt-4">
                         <div v-if="fav_materials.length > 0" class="row row-cols-1 row-cols-md-2 g-4">
-                          <MyFileComponent v-for="material, i in fav_materials" :material="material" :key="i"></MyFileComponent>
+                          <ExploreComponent v-for="material, i in fav_materials" :file="material" :key="i"></ExploreComponent>
                         </div>
                         <div v-else class="row ">
                           <div class="text-center">Nothing here, Browse some file in the explore section to give <span class="text-danger"><b>LOVE.</b></span></div>
