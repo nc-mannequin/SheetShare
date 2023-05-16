@@ -476,7 +476,7 @@ export default {
                                   <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea" v-model="comment_input" v-on:keyup.enter="onCommentEnter()"></textarea>
                                   <label for="floatingTextarea">Comments</label>
                                 </div>
-                                <h6 class="text-end"><small><small>Please add your comments below and then press enter to submit.</small></small></h6>
+                                <h6 class="text-end"><small><small>Please add your comments above and then press enter to submit.</small></small></h6>
                               </div>
                             </div>
                         </div>

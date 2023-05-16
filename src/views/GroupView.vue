@@ -19,6 +19,7 @@ export default {
         user:{},
         user_group:[],
         group_text:"",
+        group_des:"",
         group_member:{},
         member_text:"",
         selected_group:{},
@@ -107,7 +108,7 @@ export default {
       const dataObj = {
           created_at: Timestamp.now(),
           created_by: this.user.display_name,
-          description: "temp_description",
+          description: this.group_des,
           group_name: this.group_text,
           materials:[],
           members:[this.user.user_id],
@@ -297,24 +298,25 @@ export default {
                 </div>
 
                 <div class="col-md-9">
+                  <div class="row mt-3">
+                    <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">group</span>Group</span></h2>
+                  </div>
                   <section>
                     <h1>My Group</h1>
                     <input type="text" v-model="group_text">
-                    <button class="btn btn-default" @click="onNewGroupClick()">New Group</button>
-                    
-                
+                    <button class="btn btn-default" @click="onNewGroupClick()">New Group</button>        
                   </section>
-                    <div class="row" style="height: 100vh;">
-                        <div class="col-md-3 border-end" style="height: 100vh; overflow-y: scroll;">
-                            ตรงนี้จะเป็นรายชื่อกลุ่มที่ผู้ใช้อยู่<br>
+
+                    <div class="row mt-3">
+                        <div class="col-md-3 border-end" style="overflow-y: scroll; height: 80vh;">
+                          <h3 class="text-center underline">My Group</h3>
                             <div class="list-group">
                               <button v-for="(group, group_index) in user_group" @click="onGroupSelect(group)" class="list-group-item list-group-item-action list-group-item-light">{{ group[1].group_name }}</button>
                             </div>
                         </div>
-                        <div class="col-md-9" style="height: 100vh; overflow-y: scroll;" v-if="selected_group[1] != undefined">
-                            ตรงนี้จะแสดงไฟล์ที่เอามากองรวมกันและคอมเม้นต์นะกั๊บ
-                            <h1>{{ selected_group[1].group_name }}</h1>
-                            <h3>{{ selected_group[1].description }}</h3>
+                        <div class="col-md-9" style="overflow-y: scroll; height: 100vh;" v-if="selected_group[1] != undefined">
+                            <h2 class="text-center underline mb-3">&nbsp; {{ selected_group[1].group_name }} Group &nbsp;</h2>
+                            <h5 class="text-center">{{ selected_group[1].description }}</h5>
                             <h3>Members</h3>
                             <ul>
                               <li v-for="(member, member_index) in selected_group[1].members">
