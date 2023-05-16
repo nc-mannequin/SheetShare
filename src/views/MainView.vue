@@ -288,10 +288,6 @@ export default{
       }
       }
       
-      
-      
-            
-      
     },
     async onDeleteFile(docRefId){
       console.log("on delete =>",docRefId)
@@ -655,7 +651,7 @@ export default{
 
                   <label for="descriptionTextarea" class="form-label"><h5 class="mx-3 mt-1 text-start"><strong>Description</strong></h5></label><br>
                   <div class="input-group px-3">
-                    <textarea class="w-100" id="descriptionTextarea" rows="3" v-model="upload_file_detail.description"></textarea>
+                    <textarea class="w-100 form-control" id="descriptionTextarea" rows="3" v-model="upload_file_detail.description"></textarea>
                   </div>
                   <br>
 

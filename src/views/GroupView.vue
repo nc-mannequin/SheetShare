@@ -122,7 +122,7 @@ export default {
         group_id: arr_id.concat(groupDocRef.id)
       }
       const updateRef = await updateDoc(userDocRef, userDataObj)
-
+      window.location.reload();
     },
     async onLeaveGroupClick(group_id){
       const db = getFirestore()
@@ -209,6 +209,12 @@ export default {
   },
   
   // ===============================================================================================================
+
+  cancelNewGroup(){
+    this.group_des = ''
+    this.group_text = ''
+  },
+
     }
 }
 </script>
@@ -299,17 +305,17 @@ export default {
 
                 <div class="col-md-9">
                   <div class="row mt-3">
-                    <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">group</span>Group</span></h2>
+                    <div class="col">
+                      <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">group</span>Group</span></h2>
+                    </div>
+                    <div class="col text-end">
+                      <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop-newgroup"><span><span class="material-symbols-outlined me-2">add_circle</span>New Group</span></button>
+                    </div>
                   </div>
-                  <section>
-                    <h1>My Group</h1>
-                    <input type="text" v-model="group_text">
-                    <button class="btn btn-default" @click="onNewGroupClick()">New Group</button>        
-                  </section>
 
                     <div class="row mt-3">
                         <div class="col-md-3 border-end" style="overflow-y: scroll; height: 80vh;">
-                          <h3 class="text-center underline">My Group</h3>
+                          <h3 class="text-center underline mb-3">My Group</h3>
                             <div class="list-group">
                               <button v-for="(group, group_index) in user_group" @click="onGroupSelect(group)" class="list-group-item list-group-item-action list-group-item-light">{{ group[1].group_name }}</button>
                             </div>
@@ -369,24 +375,6 @@ export default {
         </div>
     </section>
 
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Reset Avatar</strong></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                Are you sure you want to reset your avatar to the default?
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" @click="resetavatar">Reset Avatar</button>
-              </div>
-            </div>
-          </div>
-    </div>
-
     <div class="modal fade" id="staticBackdrop-logout" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -405,19 +393,30 @@ export default {
           </div>
     </div>
 
-    <div class="modal fade" id="staticBackdrop-cancel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog">
+    <div class="modal fade" id="staticBackdrop-newgroup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
               <div class="modal-header">
-                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>Cancel Confirmation</strong></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h1 class="modal-title fs-5 underline" id="staticBackdropLabel"><strong>&nbsp; New Group &nbsp;</strong></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="cancelNewGroup"></button>
               </div>
               <div class="modal-body">
-                Are you sure you want to cancel? Any unsaved progress will be lost.
+                <div class="row mt-2 px-1" id="liveAlertPlaceholder-Upload"></div>
+                <form class="g-3">
+                  <label for="groupname" class="form-label"><h6 class="mx-3 mt-1 text-start"><strong>Group's Name</strong></h6></label><br>
+                  <div class="input-group px-3">
+                    <input type="text" class="form-control" id="validationDefault01" maxlength="20" name="title" v-model="group_text">
+                  </div>
+                  <label for="descriptionTextarea" class="form-label"><h6 class="mx-3 mt-4 text-start"><strong>Group's Description</strong></h6></label><br>
+                  <div class="input-group px-3">
+                    <textarea class="w-100 form-control" id="descriptionTextarea" maxlength="200" rows="3" v-model="group_des"></textarea>
+                  </div>
+                  <br>
+                </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" @click="refreshpage">Yes</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="cancelNewGroup">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="onNewGroupClick">New Group</button>
               </div>
             </div>
           </div>

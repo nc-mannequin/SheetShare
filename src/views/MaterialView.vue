@@ -376,7 +376,7 @@ export default {
                                 <div class="row g-1 mt-4">
                                   <label for="descriptionTextarea" class="form-label"><strong>Description</strong></label>
                                   <div class="input-group">
-                                    <textarea class="w-100" id="descriptionTextarea" rows="3" placeholder="No Description" v-model="file.description" disabled readonly></textarea>
+                                    <textarea class="w-100 form-control" id="descriptionTextarea" rows="3" placeholder="No Description" v-model="file.description" disabled readonly></textarea>
                                   </div>
                                 </div>
                           </form>
@@ -531,7 +531,7 @@ export default {
               <div class="modal-body mb-3">
                 <div class="row mt-2 px-1" id="liveAlertPlaceholder-Upload"></div>
                 <form class="g-3 needs-validation" novalidate>
-                  <label for="groupDropdown" class="form-label"><h5 class="mx-3 text-start"><strong>Select Group</strong><span class="text-danger">*</span></h5></label>
+                  <label for="groupDropdown" class="form-label"><h6 class="mx-3 text-start"><strong>Select Group</strong><span class="text-danger">*</span></h6></label>
                   <div class="input-group px-3">
                     <select class="form-select mb-1" id="groupDropdown" placeholder="Please select ..." required>
                       <!-- <option v-for=" ">{{  }}</option> -->

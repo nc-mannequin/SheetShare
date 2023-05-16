@@ -322,7 +322,7 @@ export default {
                                 <div class="row g-1 mt-4">
                                   <label for="descriptionTextarea" class="form-label"><strong>Description</strong></label>
                                   <div class="input-group">
-                                    <textarea class="w-100" id="descriptionTextarea" rows="3" :placeholder=file.description v-model="file.description"></textarea>
+                                    <textarea class="w-100 form-control" id="descriptionTextarea" rows="3" :placeholder=file.description v-model="file.description"></textarea>
                                   </div>
                                 </div>
                           </form>
