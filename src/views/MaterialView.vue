@@ -61,12 +61,16 @@ export default {
             const docRef = doc(db,"material/"+this.$route.params.file_doc_ref)
             await getDoc(docRef)
             .then((result) => {
+              try{
                 this.file = result.data()
                 const storage = getStorage();
                 const fileRef = ref(storage, this.file.file_url);
                 getDownloadURL(fileRef).then((url) => {
                     this.file.source = url
                 })
+              }
+              catch(e){}
+                
             })
 
             const owner_user = snapShot.docs.map(doc => [doc.id,doc.data()] ).filter(f => f[1].user_id == this.file.user_id)

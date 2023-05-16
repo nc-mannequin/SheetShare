@@ -118,7 +118,6 @@ export default {
       const materialDocRef = doc(db,"material/"+docRefId)
       await deleteDoc(materialDocRef)
       this.$router.replace('/home')
-      window.location.reload();
     },
 
         // ===============================================================================================================
@@ -408,7 +407,7 @@ export default {
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" @click="onDeleteFile">DELETE</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="onDeleteFile">DELETE</button>
               </div>
             </div>
           </div>
