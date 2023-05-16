@@ -3,7 +3,6 @@
   "root": "dist",
   "clean_urls": true,
   "routes": {
-    "/**": 'src/views/HomeView.vue'
-"
+    "/**": "src/views/HomeView.vue"
   }
 }
