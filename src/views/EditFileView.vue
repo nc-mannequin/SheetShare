@@ -44,12 +44,20 @@ export default {
             await getDoc(docRef)
             .then((result) => {
                 this.file = result.data()
-                const storage = getStorage();
-                const fileRef = ref(storage, this.file.file_url);
-                getDownloadURL(fileRef).then((url) => {
-                    this.file.source = url
-                    console.log(this.file)
-                })
+
+                try{
+                  const storage = getStorage();
+                  const fileRef = ref(storage, this.file.file_url);
+                  getDownloadURL(fileRef).then((url) => {
+                      this.file.source = url
+                      console.log(this.file)
+                  })
+                }
+                catch(e){
+
+                }
+                
+
             })
 
 

@@ -553,9 +553,13 @@ export default{
                       <h4 class="underline"><strong>My Materials</strong></h4>
                     </div>
                     <div class="container mt-4">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div v-if="own_materials.length > 0" class="row row-cols-1 row-cols-md-2 g-4">
                           <MyFileComponent v-for="material, i in own_materials" :material="material" :key="i"></MyFileComponent>
                         </div>
+                        <div v-else class="row ">
+                          <div class="text-center">Nothing here, Time to <span class="text-success"><b>upload</b></span> some file!</div>
+                        </div>
+
                       </div>
                   </div>
                   <div class="mt-4">
@@ -563,8 +567,11 @@ export default{
                       <h4 class="underline"><strong>My Favourited</strong></h4>
                     </div>
                     <div class="container mt-4">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div v-if="fav_materials.length > 0" class="row row-cols-1 row-cols-md-2 g-4">
                           <MyFileComponent v-for="material, i in fav_materials" :material="material" :key="i"></MyFileComponent>
+                        </div>
+                        <div v-else class="row ">
+                          <div class="text-center">Nothing here, Browse some file in the explore section to give <span class="text-danger"><b>LOVE.</b></span></div>
                         </div>
                       </div>
                   </div>
