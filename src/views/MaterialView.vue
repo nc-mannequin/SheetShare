@@ -146,7 +146,7 @@ export default {
     },
     async onCommentEnter(){
       if(this.comment_input.trim().length == 0){
-        alert("U sending nothing. idiot.")
+        alert("Please add your comments before pressing enter to submit.")
       }
       else
       {

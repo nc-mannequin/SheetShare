@@ -26,6 +26,7 @@ export default {
         user_opt:[],
         selected_user:[],
         joke: "",
+        comment_input:"",
         }
     },
     beforeMount () {
@@ -217,6 +218,32 @@ export default {
     this.group_text = ''
   },
 
+  async onCommentEnter(){
+      if(this.comment_input.trim().length == 0){
+        alert("Please add your comments before pressing enter to submit.")
+      }
+      else
+      {
+        // const new_comment = {
+        //   display_name:this.user.display_name,
+        //   identifier_email:this.user.identifier_email,
+        //   created_date:Timestamp.now(),
+        //   img_url:this.user.photo_url,
+        //   msg:this.comment_input
+        // }
+        // const db = getFirestore()
+        // var current_comments = this.file.comments
+        // current_comments.push(new_comment)
+        // const changeDetail = {
+        //   comments:current_comments
+        // }
+        // const materialDocRef = doc(db,"material/"+this.$route.params.file_doc_ref)
+        // await updateDoc(materialDocRef,changeDetail)
+        this.comment_input= ""
+      }
+      
+    },
+
     },
   computed: {
     evenMembers() {
@@ -389,7 +416,13 @@ export default {
                                   </h2>
                                   <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
                                     <div class="accordion-body">
-                                      <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                      <div class="container mt-4">
+                                        <div v-if="selected_group[1].materials.length != 0" style="overflow-y: scroll; height: 60vh;">
+                                          <div class="row row-cols-1 row-cols-md-2 g-4">
+                                            <ExploreComponent v-for="file, i in selected_group[1].materials" :file="file" :key="i"></ExploreComponent>
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -401,7 +434,77 @@ export default {
                                   </h2>
                                   <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
                                     <div class="accordion-body">
-                                      <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                      <div class="container mt-5">
+                                        <div v-if="selected_group[1].comments.length != 0" style="overflow-y: scroll; height: 60vh;">
+
+                                          <div v-for="comment in selected_group[1].comments" class="container my-3 border border-1 border-warning">
+                                            <div class="row my-3">
+                                              <div class="col-4 col-md-2 text-center">
+                                                <img :src=comment.img_url :alt="comment.display_name + 'img'" class="close-image" style="scale: 0.7;"/>
+                                              </div>
+                                              <div class="col-8 col-md-7 align-self-center">
+                                                <div class="row">
+                                                  <h4><strong> {{ comment.display_name }} </strong></h4>
+                                                </div>
+                                                <div class="row">
+                                                  <h6><small><small>{{ comment.identifier_email }}</small></small></h6>
+                                                </div>
+                                              </div>
+                                              <div class="col-12 col-md-3 align-self-center text-end">
+                                                <div class="row my-1">
+                                                  <h6><small>{{ comment.created_date.toDate().toDateString() }}</small></h6>
+                                                </div>
+                                                <div class="row my-1">
+                                                  <h6><small>{{ comment.created_date.toDate().toLocaleTimeString() }}</small></h6>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div class="row my-3">
+                                                <div class="align-items-center px-4">
+                                                  {{ comment.msg }}
+                                                </div>
+                                              </div>
+                                          </div>
+                        
+                                        </div>
+                                        <div class="row mt-3">
+                                          <h2><span class="underline"><span class="material-symbols-outlined mx-2 thispage">add_comment</span>Add Comment</span></h2>
+                                        </div>
+                                        <div class="container my-3 border border-1 border-warning">
+                                          <div class="row my-3">
+                                            <div class="col-4 col-md-2 text-center">
+                                              <div v-if="user?.photo_url != ''">
+                                                <img :src=user.photo_url alt="user_img" class="close-image" style="scale: 0.5;">
+                                              </div>
+                                            </div>
+                                            <div class="col-8 col-md-7 align-self-center">
+                                              <div class="row">
+                                                <h4><strong> {{ user.display_name }} </strong></h4>
+                                              </div>
+                                              <div class="row">
+                                                <h6><small><small>{{ user.identifier_email }}</small></small></h6>
+                                              </div>
+                                            </div>
+                                            <div class="col-12 col-md-3 align-self-center text-end">
+                                              <div class="row my-1">
+                                                <h6><small></small></h6>
+                                              </div>
+                                              <div class="row my-1">
+                                                <h6><small></small></h6>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="row my-3">
+                                              <div class="align-items-center px-4">
+                                                <div class="form-floating">
+                                                  <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea" v-model="comment_input" v-on:keyup.enter="onCommentEnter()"></textarea>
+                                                  <label for="floatingTextarea">Comments</label>
+                                                </div>
+                                                <h6 class="text-end"><small><small>Please add your comments above and then press enter to submit.</small></small></h6>
+                                              </div>
+                                            </div>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
